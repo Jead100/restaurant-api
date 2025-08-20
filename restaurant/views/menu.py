@@ -1,10 +1,10 @@
 """
 API views for restaurant endpoints.
 
-Defines viewsets for managing menu items, categories, 
-carts, and orders, built on top of `RestaurantBaseViewSet` 
-and Django REST Framework features like authentication, 
-permissions, throttling, filtering, pagination, and 
+Defines viewsets for managing menu items, categories,
+carts, and orders, built on top of `RestaurantBaseViewSet`
+and Django REST Framework features like authentication,
+permissions, throttling, filtering, pagination, and
 serialization.
 """
 
@@ -19,8 +19,9 @@ from core.pagination import CustomPageNumberPagination
 from restaurant.filters import StrictOrderingFilter
 from restaurant.models import Category, MenuItem
 from restaurant.serializers.menu import (
-    CategorySerializer, 
-    MenuItemSerializer,
+    CategorySerializer,
+    MenuItemResponseSerializer,
+    MenuItemWriteSerializer,
 )
 from restaurant.viewsets import RestaurantBaseViewSet
 
@@ -39,9 +40,12 @@ class MenuItemViewSet(RestaurantBaseViewSet):
     """
 
     queryset = MenuItem.objects.all()
-    serializer_class = MenuItemSerializer
     permission_classes = [IsAuthenticated, IsManagerOrReadOnly]
     throttle_classes = [AnonRateThrottle, UserRateThrottle]
+
+    # Read-only serializer used for list/retrieve responses and
+    # for reserializing output in create/update actions
+    res_serializer_cls = MenuItemResponseSerializer
 
     filter_backends = [DjangoFilterBackend, StrictOrderingFilter, filters.SearchFilter]
     filterset_fields = {
@@ -55,6 +59,14 @@ class MenuItemViewSet(RestaurantBaseViewSet):
 
     # Used in default response messages via `self.msg()`
     resource_name = "Menu item"
+
+    def get_serializer_class(self):
+        """
+        Returns the default serializer for an action in the viewset.
+        """
+        if self.action in ("create", "update", "partial_update"):
+            return MenuItemWriteSerializer
+        return self.res_serializer_cls
 
 
 class CategoryViewSet(RestaurantBaseViewSet):
