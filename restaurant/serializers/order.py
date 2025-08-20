@@ -31,7 +31,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
         )
 
 
-class OrderReadSerializer(serializers.ModelSerializer):
+class OrderResponseSerializer(serializers.ModelSerializer):
     """
     Base serializer for viewing a single order or order list.
     """
@@ -60,7 +60,7 @@ class OrderUserSerializer(serializers.ModelSerializer):
         fields = ("id", "username")
 
 
-class ManagerOrderReadSerializer(OrderReadSerializer):
+class ManagerOrderResponseSerializer(OrderResponseSerializer):
     """
     Adds user and delivery-crew details for manager views.
     """
@@ -68,8 +68,8 @@ class ManagerOrderReadSerializer(OrderReadSerializer):
     user = OrderUserSerializer(read_only=True)
     delivery_crew = OrderUserSerializer(read_only=True)
 
-    class Meta(OrderReadSerializer.Meta):
-        fields = OrderReadSerializer.Meta.fields + ("user", "delivery_crew")
+    class Meta(OrderResponseSerializer.Meta):
+        fields = OrderResponseSerializer.Meta.fields + ("user", "delivery_crew")
 
 
 class DeliveryCrewOrderUpdateSerializer(StrictFieldsMixin, serializers.ModelSerializer):

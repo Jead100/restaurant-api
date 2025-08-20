@@ -4,6 +4,7 @@ from rest_framework.response import Response
 
 from core.mixins.message import DEFAULT_RESOURCE_NAME
 
+
 class CustomPageNumberPagination(PageNumberPagination):
     """
     Custom paginator that adds a localized `detail` message
@@ -51,3 +52,37 @@ class CustomPageNumberPagination(PageNumberPagination):
             },
             status=status.HTTP_200_OK,
         )
+
+    def get_paginated_response_schema(self, schema):
+        # OpenAPI response schema for paginated responses
+        return {
+            "type": "object",
+            "required": ["detail", "data", "count"],
+            "properties": {
+                "detail": {
+                    "type": "string",
+                    "example": "Item list.",
+                },
+                "data": schema,
+                "count": {
+                    "type": "integer",
+                    "example": 42,
+                },
+                "next": {
+                    "type": "string",
+                    "nullable": True,
+                    "format": "uri",
+                    "example": "http://api.example.org/accounts/?{page_query_param}=4".format(
+                        page_query_param=self.page_query_param
+                    ),
+                },
+                "previous": {
+                    "type": "string",
+                    "nullable": True,
+                    "format": "uri",
+                    "example": "http://api.example.org/accounts/?{page_query_param}=2".format(
+                        page_query_param=self.page_query_param
+                    ),
+                },
+            },
+        }

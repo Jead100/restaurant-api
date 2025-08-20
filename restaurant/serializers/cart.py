@@ -9,7 +9,7 @@ from restaurant.serializers.menu import MenuItemTinySerializer
 from core.serializers.mixins import StrictFieldsMixin
 
 
-class CartReadSerializer(serializers.ModelSerializer):
+class CartResponseSerializer(serializers.ModelSerializer):
     """
     Read-only cart item representation
     """

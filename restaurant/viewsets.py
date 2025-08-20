@@ -15,8 +15,9 @@ class RestaurantBaseViewSet(
     ExtendedGenericViewSet,
 ):
     """
-    Provides all standard CRUD actions such as `create()`, 
-    `retrieve()`, `update()`, and `destroy()`, plus 
+    Provides all standard CRUD actions such as `create()`,
+    `retrieve()`, `update()`, and `destroy()`, plus
     `partial_update()` and `list()` via `core.mixins.model_mixins'.
     """
+
     pass

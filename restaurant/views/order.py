@@ -1,10 +1,10 @@
 """
 API views for restaurant endpoints.
 
-Defines viewsets for managing menu items, categories, 
-carts, and orders, built on top of `RestaurantBaseViewSet` 
-and Django REST Framework features like authentication, 
-permissions, throttling, filtering, pagination, and 
+Defines viewsets for managing menu items, categories,
+carts, and orders, built on top of `RestaurantBaseViewSet`
+and Django REST Framework features like authentication,
+permissions, throttling, filtering, pagination, and
 serialization.
 """
 
@@ -25,9 +25,9 @@ from restaurant.filters import OrderFilter, StrictOrderingFilter
 from restaurant.models import Cart, Order, OrderItem
 from restaurant.serializers.order import (
     DeliveryCrewOrderUpdateSerializer,
-    ManagerOrderReadSerializer,
+    ManagerOrderResponseSerializer,
     ManagerOrderUpdateSerializer,
-    OrderReadSerializer,
+    OrderResponseSerializer,
 )
 from restaurant.viewsets import RestaurantBaseViewSet
 
@@ -60,9 +60,9 @@ class OrderViewSet(RestaurantBaseViewSet):
     resource_name = "Order"
 
     READ_SERIALIZERS = {
-        "manager": ManagerOrderReadSerializer,
-        "delivery_crew": OrderReadSerializer,
-        "customer": OrderReadSerializer,
+        "manager": ManagerOrderResponseSerializer,
+        "delivery_crew": OrderResponseSerializer,
+        "customer": OrderResponseSerializer,
     }
     WRITE_SERIALIZERS = {
         "manager": ManagerOrderUpdateSerializer,
@@ -75,7 +75,7 @@ class OrderViewSet(RestaurantBaseViewSet):
 
     @property
     def res_serializer_cls(self):
-        # Role-specific read-only serializer for response 
+        # Role-specific read-only serializer for response
         # reserialization in create/update actions
         return self.READ_SERIALIZERS[self.user_role]
 
@@ -99,7 +99,7 @@ class OrderViewSet(RestaurantBaseViewSet):
         elif method == "DELETE":
             # Only managers can DELETE orders
             permission_list += [IsManager]
-            
+
         self.permission_classes = permission_list
         return super().get_permissions()
 
@@ -135,9 +135,10 @@ class OrderViewSet(RestaurantBaseViewSet):
 
     def get_serializer_class(self):
         # Return the appropriate serializer based on action and user role.
-        # Write serializers are used for updates; read serializers for all other actions.
+        # Write serializers are used for updates; read serializers for
+        # all other actions.
         if self.action in ("update", "partial_update"):
-            return self.WRITE_SERIALIZERS.get(self.user_role, OrderReadSerializer)
+            return self.WRITE_SERIALIZERS.get(self.user_role, OrderResponseSerializer)
 
         return self.READ_SERIALIZERS[self.user_role]
 

@@ -1,10 +1,10 @@
 """
 API views for restaurant endpoints.
 
-Defines viewsets for managing menu items, categories, 
-carts, and orders, built on top of `RestaurantBaseViewSet` 
-and Django REST Framework features like authentication, 
-permissions, throttling, filtering, pagination, and 
+Defines viewsets for managing menu items, categories,
+carts, and orders, built on top of `RestaurantBaseViewSet`
+and Django REST Framework features like authentication,
+permissions, throttling, filtering, pagination, and
 serialization.
 """
 
@@ -21,7 +21,7 @@ from core.responses import format_response
 from restaurant.models import Cart
 from restaurant.serializers.cart import (
     CartCreateSerializer,
-    CartReadSerializer,
+    CartResponseSerializer,
     CartUpdateSerializer,
 )
 from restaurant.viewsets import RestaurantBaseViewSet
@@ -46,7 +46,7 @@ class CartViewSet(RestaurantBaseViewSet):
 
     # Read-only serializer used for list/retrieve responses and
     # for reserializing output in create/update actions
-    res_serializer_cls = CartReadSerializer
+    res_serializer_cls = CartResponseSerializer
 
     ACTION_SERIALIZERS = {
         "list": res_serializer_cls,

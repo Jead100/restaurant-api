@@ -67,6 +67,6 @@ class ResponseMessageMixin(ResourceNameMixin):
         Default context variables for message formatting.
         """
         return {
-            "resource": self.get_resource_name(), 
-            "resource_plural": self.get_resource_plural_name()
+            "resource": self.get_resource_name(),
+            "resource_plural": self.get_resource_plural_name(),
         }

@@ -16,10 +16,26 @@ class MenuItem(models.Model):
     A food item offered on the menu.
     """
 
-    title = models.CharField(max_length=255, unique=True, db_index=True)
-    price = models.DecimalField(max_digits=6, decimal_places=2, db_index=True)
-    featured = models.BooleanField(db_index=True)
-    category = models.ForeignKey(Category, on_delete=models.PROTECT)
+    title = models.CharField(
+        max_length=255,
+        unique=True,
+        db_index=True,
+        help_text="The name of the menu item.",
+    )
+    price = models.DecimalField(
+        max_digits=6,
+        decimal_places=2,
+        db_index=True,
+        help_text="The price of the item in USD.",
+    )
+    featured = models.BooleanField(
+        db_index=True, help_text="Indicates whether the item is featured."
+    )
+    category = models.ForeignKey(
+        to=Category,
+        on_delete=models.PROTECT,
+        help_text="The category this item belongs to.",
+    )
 
 
 class Cart(models.Model):

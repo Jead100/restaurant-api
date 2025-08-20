@@ -1,9 +1,9 @@
 from .roles import (
-    IsManager, 
-    IsCustomer, 
-    IsDeliveryCrew, 
+    IsManager,
+    IsCustomer,
+    IsDeliveryCrew,
     IsManagerOrDeliveryCrew,
-    IsManagerOrReadOnly
+    IsManagerOrReadOnly,
 )
 
 

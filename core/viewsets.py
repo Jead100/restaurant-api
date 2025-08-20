@@ -11,7 +11,7 @@ from core.mixins.message import ResponseMessageMixin
 
 class ExtendedGenericViewSet(GenericViewSet, ResponseMessageMixin):
     """
-    Extends DRF's `GenericViewSet` with support for 
+    Extends DRF's `GenericViewSet` with support for
     resource naming and custom response messages.
     """
 

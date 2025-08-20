@@ -7,9 +7,7 @@ from core.mixins import model_mixins
 from core.responses import format_response
 from core.viewsets import ExtendedGenericViewSet
 
-from users.serializers.groups import (
-    GroupUserSerializer, AddUserToGroupSerializer
-)
+from users.serializers.groups import GroupUserSerializer, AddUserToGroupSerializer
 
 
 class GroupMembershipViewSet(

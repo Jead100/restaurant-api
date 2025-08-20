@@ -7,26 +7,26 @@ from rest_framework import serializers
 from restaurant.models import MenuItem, Category
 
 
-class MenuItemSerializer(serializers.HyperlinkedModelSerializer):
-    """
-    Menu item with price validation and hyperlinked `category`.
-    """
-
+class MenuItemResponseSerializer(serializers.HyperlinkedModelSerializer):
     category = serializers.HyperlinkedRelatedField(
-        view_name="category-detail", queryset=Category.objects.all()
+        view_name="category-detail", read_only=True
     )
 
     class Meta:
         model = MenuItem
-        fields = (
-            "url",
-            "id",
-            "title",
-            "price",
-            "featured",
-            "category",
-        )
-        read_only_fields = ("id",)
+        fields = ("url", "id", "title", "price", "featured", "category")
+        read_only_fields = fields
+
+
+class MenuItemWriteSerializer(serializers.ModelSerializer):
+    category = serializers.PrimaryKeyRelatedField(
+        queryset=Category.objects.all(),
+        help_text="The ID of the category this item belongs to.",
+    )
+
+    class Meta:
+        model = MenuItem
+        fields = ("title", "price", "featured", "category")
 
     def validate_price(self, value):
         if value <= 0:
@@ -36,9 +36,39 @@ class MenuItemSerializer(serializers.HyperlinkedModelSerializer):
         return value
 
 
+# class MenuItemSerializer(serializers.HyperlinkedModelSerializer):
+#     """
+#     Menu item with price validation and hyperlinked `category`.
+#     """
+
+#     category = serializers.HyperlinkedRelatedField(
+#         view_name="category-detail", queryset=Category.objects.all()
+#     )
+
+#     class Meta:
+#         model = MenuItem
+#         fields = (
+#             "url",
+#             "id",
+#             "title",
+#             "price",
+#             "featured",
+#             "category",
+#         )
+#         read_only_fields = ("id",)
+
+#     def validate_price(self, value):
+#         if value <= 0:
+#             raise serializers.ValidationError("Must be a positive number.")
+#         if value > 100.0:
+#             raise serializers.ValidationError("Must not exceed 100.00.")
+#         return value
+
+
 class MenuItemTinySerializer(serializers.ModelSerializer):
     """
-    Minimal menu-item details (id + title as `name`).
+    Minimal menu-item details (id + title as `name`)
+    for embedding in cart lines.
     """
 
     name = serializers.CharField(source="title")

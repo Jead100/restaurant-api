@@ -44,8 +44,7 @@ class CustomCreateModelMixin(mixins.CreateModelMixin):
         res_serializer_cls = getattr(self, "res_serializer_cls", None)
         if res_serializer_cls is not None:
             res_serializer = self.res_serializer_cls(
-                serializer.instance, 
-                context=self.get_serializer_context()
+                serializer.instance, context=self.get_serializer_context()
             )
             data = res_serializer.data
         else:
@@ -84,8 +83,7 @@ class CustomUpdateModelMixin(mixins.UpdateModelMixin):
         res_serializer_cls = getattr(self, "res_serializer_cls", None)
         if res_serializer_cls is not None:
             res_serializer = self.res_serializer_cls(
-                instance, 
-                context=self.get_serializer_context()
+                instance, context=self.get_serializer_context()
             )
             data = res_serializer.data
         else:
