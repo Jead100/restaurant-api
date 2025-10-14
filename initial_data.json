@@ -1,0 +1,548 @@
+[
+    {
+        "model": "users.user",
+        "pk": 1,
+        "fields": {
+            "password": "pbkdf2_sha256$1000000$uFB6SdA9cIYVWBKCxOGoaV$cIIW4G99ysvznQ4o4yvPNHtiSnAIZeI9TKJWVEmQNQA=",
+            "last_login": "2025-09-29T17:08:11.230Z",
+            "is_superuser": true,
+            "username": "jorda",
+            "first_name": "",
+            "last_name": "",
+            "email": "jordan@littlelemon.com",
+            "is_staff": true,
+            "is_active": true,
+            "date_joined": "2025-09-29T17:07:43Z",
+            "is_demo": false,
+            "demo_expires_at": null,
+            "uuid": "0799e296-cb6f-4492-8681-ab4bf6fc08e9",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "users.user",
+        "pk": 2,
+        "fields": {
+            "password": "pbkdf2_sha256$1000000$4OowmrjLuIy6bXl7yTBM6v$W77pt3U7ILXDQZ2FDDWsoL8241V/RPCGV3EEtkiuPNo=",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "alexisascanoa",
+            "first_name": "",
+            "last_name": "",
+            "email": "alexis@littlelemon.com",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2025-09-29T17:25:47Z",
+            "is_demo": false,
+            "demo_expires_at": null,
+            "uuid": "3b2ccbc4-f8f8-43cd-b67f-95b43afc6354",
+            "groups": [
+                1
+            ],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "users.user",
+        "pk": 3,
+        "fields": {
+            "password": "pbkdf2_sha256$1000000$PSmS7ResHYLrXvZ1bULVOW$HW/TYeeo0qmEhEkhPLBG56kqmYzmAyiEWtjrE3YAneg=",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "brendaascanoa",
+            "first_name": "",
+            "last_name": "",
+            "email": "brenda@littlelemon.com",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2025-09-29T17:26:19Z",
+            "is_demo": false,
+            "demo_expires_at": null,
+            "uuid": "905fa6ad-228c-48f8-9b04-49c88ab18f26",
+            "groups": [
+                2
+            ],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "users.user",
+        "pk": 4,
+        "fields": {
+            "password": "pbkdf2_sha256$1000000$nt2lUNB9CIRPJtHCXWuH6z$zUJsUr12Dp8ej05BLylq5Uv8Ynyfa3jjtHTC/XvHRJA=",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "cesarpoma",
+            "first_name": "",
+            "last_name": "",
+            "email": "cesarp@littlelemon.com",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2025-09-29T17:26:34Z",
+            "is_demo": false,
+            "demo_expires_at": null,
+            "uuid": "8e4d69b8-dc12-442c-8562-0dc8def00e0d",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "users.user",
+        "pk": 21,
+        "fields": {
+            "password": "pbkdf2_sha256$1000000$loBMzzkMKDBJa3JWI0veCd$qN4h2/f9Wy7qmsEUJXpiV0j7dnKaWJEd51KIG6J9aV4=",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "demo_mitdop3da",
+            "first_name": "",
+            "last_name": "",
+            "email": "demo_mitdop3da@demo-invalid.com",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2025-10-11T13:09:36Z",
+            "is_demo": true,
+            "demo_expires_at": "2025-10-11T13:00:00Z",
+            "uuid": "5f603815-8944-485c-a25c-fdd2871626a3",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "auth.group",
+        "pk": 1,
+        "fields": {
+            "name": "Manager",
+            "permissions": []
+        }
+    },
+    {
+        "model": "auth.group",
+        "pk": 2,
+        "fields": {
+            "name": "Delivery crew",
+            "permissions": []
+        }
+    },
+    {
+        "model": "restaurant.category",
+        "pk": 1,
+        "fields": {
+            "is_demo": false,
+            "slug": "appetizers",
+            "title": "Appetizers"
+        }
+    },
+    {
+        "model": "restaurant.category",
+        "pk": 2,
+        "fields": {
+            "is_demo": false,
+            "slug": "main-course",
+            "title": "Main Course"
+        }
+    },
+    {
+        "model": "restaurant.category",
+        "pk": 3,
+        "fields": {
+            "is_demo": false,
+            "slug": "desserts",
+            "title": "Desserts"
+        }
+    },
+    {
+        "model": "restaurant.menuitem",
+        "pk": 1,
+        "fields": {
+            "is_demo": false,
+            "title": "Stuffed Mushrooms",
+            "price": "8.99",
+            "featured": true,
+            "category": 1
+        }
+    },
+    {
+        "model": "restaurant.menuitem",
+        "pk": 2,
+        "fields": {
+            "is_demo": false,
+            "title": "Garlic Parmesan Wings",
+            "price": "10.50",
+            "featured": false,
+            "category": 1
+        }
+    },
+    {
+        "model": "restaurant.menuitem",
+        "pk": 3,
+        "fields": {
+            "is_demo": false,
+            "title": "Bruschetta",
+            "price": "7.25",
+            "featured": true,
+            "category": 1
+        }
+    },
+    {
+        "model": "restaurant.menuitem",
+        "pk": 4,
+        "fields": {
+            "is_demo": false,
+            "title": "Mozzarella Sticks",
+            "price": "6.75",
+            "featured": false,
+            "category": 1
+        }
+    },
+    {
+        "model": "restaurant.menuitem",
+        "pk": 5,
+        "fields": {
+            "is_demo": false,
+            "title": "Spinach Artichoke Dip",
+            "price": "9.00",
+            "featured": true,
+            "category": 1
+        }
+    },
+    {
+        "model": "restaurant.menuitem",
+        "pk": 6,
+        "fields": {
+            "is_demo": false,
+            "title": "Loaded Nachos",
+            "price": "11.50",
+            "featured": false,
+            "category": 1
+        }
+    },
+    {
+        "model": "restaurant.menuitem",
+        "pk": 7,
+        "fields": {
+            "is_demo": false,
+            "title": "Crispy Calamari",
+            "price": "12.00",
+            "featured": true,
+            "category": 1
+        }
+    },
+    {
+        "model": "restaurant.menuitem",
+        "pk": 8,
+        "fields": {
+            "is_demo": false,
+            "title": "Shrimp Cocktail",
+            "price": "13.75",
+            "featured": false,
+            "category": 1
+        }
+    },
+    {
+        "model": "restaurant.menuitem",
+        "pk": 9,
+        "fields": {
+            "is_demo": false,
+            "title": "Grilled Ribeye Steak",
+            "price": "24.99",
+            "featured": true,
+            "category": 2
+        }
+    },
+    {
+        "model": "restaurant.menuitem",
+        "pk": 10,
+        "fields": {
+            "is_demo": false,
+            "title": "Spaghetti Carbonara",
+            "price": "17.25",
+            "featured": false,
+            "category": 2
+        }
+    },
+    {
+        "model": "restaurant.menuitem",
+        "pk": 11,
+        "fields": {
+            "is_demo": false,
+            "title": "BBQ Ribs",
+            "price": "21.50",
+            "featured": true,
+            "category": 2
+        }
+    },
+    {
+        "model": "restaurant.menuitem",
+        "pk": 12,
+        "fields": {
+            "is_demo": false,
+            "title": "Chicken Alfredo",
+            "price": "18.75",
+            "featured": false,
+            "category": 2
+        }
+    },
+    {
+        "model": "restaurant.menuitem",
+        "pk": 13,
+        "fields": {
+            "is_demo": false,
+            "title": "Salmon Teriyaki",
+            "price": "23.00",
+            "featured": true,
+            "category": 2
+        }
+    },
+    {
+        "model": "restaurant.menuitem",
+        "pk": 14,
+        "fields": {
+            "is_demo": false,
+            "title": "Vegetarian Lasagna",
+            "price": "16.00",
+            "featured": false,
+            "category": 2
+        }
+    },
+    {
+        "model": "restaurant.menuitem",
+        "pk": 15,
+        "fields": {
+            "is_demo": false,
+            "title": "Seafood Paella",
+            "price": "25.50",
+            "featured": true,
+            "category": 2
+        }
+    },
+    {
+        "model": "restaurant.menuitem",
+        "pk": 16,
+        "fields": {
+            "is_demo": false,
+            "title": "Butter Chicken",
+            "price": "19.00",
+            "featured": false,
+            "category": 2
+        }
+    },
+    {
+        "model": "restaurant.menuitem",
+        "pk": 17,
+        "fields": {
+            "is_demo": false,
+            "title": "Chocolate Lava Cake",
+            "price": "7.50",
+            "featured": true,
+            "category": 3
+        }
+    },
+    {
+        "model": "restaurant.menuitem",
+        "pk": 18,
+        "fields": {
+            "is_demo": false,
+            "title": "Classic Tiramisu",
+            "price": "6.75",
+            "featured": false,
+            "category": 3
+        }
+    },
+    {
+        "model": "restaurant.menuitem",
+        "pk": 19,
+        "fields": {
+            "is_demo": false,
+            "title": "Creme Brulee",
+            "price": "8.00",
+            "featured": true,
+            "category": 3
+        }
+    },
+    {
+        "model": "restaurant.menuitem",
+        "pk": 20,
+        "fields": {
+            "is_demo": false,
+            "title": "Panna Cotta",
+            "price": "7.25",
+            "featured": false,
+            "category": 3
+        }
+    },
+    {
+        "model": "restaurant.menuitem",
+        "pk": 21,
+        "fields": {
+            "is_demo": false,
+            "title": "Cheesecake",
+            "price": "9.00",
+            "featured": true,
+            "category": 3
+        }
+    },
+    {
+        "model": "restaurant.menuitem",
+        "pk": 22,
+        "fields": {
+            "is_demo": false,
+            "title": "Apple Pie",
+            "price": "5.75",
+            "featured": false,
+            "category": 3
+        }
+    },
+    {
+        "model": "restaurant.menuitem",
+        "pk": 23,
+        "fields": {
+            "is_demo": false,
+            "title": "Lemon Tart",
+            "price": "6.25",
+            "featured": false,
+            "category": 3
+        }
+    },
+    {
+        "model": "restaurant.menuitem",
+        "pk": 24,
+        "fields": {
+            "is_demo": false,
+            "title": "New York Cheesecake",
+            "price": "8.99",
+            "featured": true,
+            "category": 3
+        }
+    },
+    {
+        "model": "restaurant.menuitem",
+        "pk": 25,
+        "fields": {
+            "is_demo": false,
+            "title": "Strawberry Cheesecake",
+            "price": "9.50",
+            "featured": false,
+            "category": 3
+        }
+    },
+    {
+        "model": "restaurant.menuitem",
+        "pk": 26,
+        "fields": {
+            "is_demo": false,
+            "title": "Papa a la huancaina",
+            "price": "5.50",
+            "featured": true,
+            "category": 1
+        }
+    },
+    {
+        "model": "restaurant.order",
+        "pk": 1,
+        "fields": {
+            "is_demo": true,
+            "user": 4,
+            "delivery_crew": 3,
+            "status": false,
+            "total": "84.73",
+            "date": "2025-10-12"
+        }
+    },
+    {
+        "model": "restaurant.order",
+        "pk": 2,
+        "fields": {
+            "is_demo": true,
+            "user": 4,
+            "delivery_crew": 3,
+            "status": true,
+            "total": "59.00",
+            "date": "2025-10-12"
+        }
+    },
+    {
+        "model": "restaurant.orderitem",
+        "pk": 1,
+        "fields": {
+            "order": 1,
+            "menuitem": 6,
+            "item_title": "Loaded Nachos",
+            "quantity": 2,
+            "unit_price": "11.50",
+            "price": "23.00"
+        }
+    },
+    {
+        "model": "restaurant.orderitem",
+        "pk": 2,
+        "fields": {
+            "order": 1,
+            "menuitem": 21,
+            "item_title": "Cheesecake",
+            "quantity": 3,
+            "unit_price": "9.00",
+            "price": "27.00"
+        }
+    },
+    {
+        "model": "restaurant.orderitem",
+        "pk": 3,
+        "fields": {
+            "order": 1,
+            "menuitem": 22,
+            "item_title": "Apple Pie",
+            "quantity": 1,
+            "unit_price": "5.75",
+            "price": "5.75"
+        }
+    },
+    {
+        "model": "restaurant.orderitem",
+        "pk": 4,
+        "fields": {
+            "order": 1,
+            "menuitem": 1,
+            "item_title": "Stuffed Mushrooms",
+            "quantity": 2,
+            "unit_price": "8.99",
+            "price": "17.98"
+        }
+    },
+    {
+        "model": "restaurant.orderitem",
+        "pk": 5,
+        "fields": {
+            "order": 1,
+            "menuitem": 26,
+            "item_title": "Papa a la huancaina",
+            "quantity": 2,
+            "unit_price": "5.50",
+            "price": "11.00"
+        }
+    },
+    {
+        "model": "restaurant.orderitem",
+        "pk": 6,
+        "fields": {
+            "order": 2,
+            "menuitem": 14,
+            "item_title": "Vegetarian Lasagna",
+            "quantity": 2,
+            "unit_price": "16.00",
+            "price": "32.00"
+        }
+    },
+    {
+        "model": "restaurant.orderitem",
+        "pk": 7,
+        "fields": {
+            "order": 2,
+            "menuitem": 4,
+            "item_title": "Mozzarella Sticks",
+            "quantity": 4,
+            "unit_price": "6.75",
+            "price": "27.00"
+        }
+    }
+]

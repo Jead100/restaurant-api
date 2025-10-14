@@ -9,12 +9,18 @@ djangorestframework = "*"
 djoser = "*"
 django-filter = "*"
 python-decouple = "*"
+drf-spectacular = "*"
+djangorestframework-simplejwt = "*"
+dj-database-url = "*"
+psycopg2-binary = "*"
+whitenoise = {extras = ["brotli"], version = "*"}
+gunicorn = "*"
+uvicorn = "*"
 
 [dev-packages]
 black = "*"
 ruff = "*"
 pre-commit = "*"
-django-extensions = "*"
 
 [requires]
 python_version = "3.11"
