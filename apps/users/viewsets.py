@@ -1,4 +1,5 @@
 from django.contrib.auth.models import Group
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import cached_property
 
 from rest_framework import status
@@ -8,7 +9,7 @@ from apps.core.responses import format_response
 from apps.core.viewsets import ExtendedGenericViewSet
 
 from .models import User
-from .serializers.groups import GroupUserSerializer, AddUserToGroupSerializer
+from .serializers.users import UserSerializer, UsernameLookupSerializer
 
 
 class GroupMembershipViewSet(
@@ -24,31 +25,54 @@ class GroupMembershipViewSet(
     Subclasses must set `group_name` (e.g., 'Delivery crew').
     """
 
-    group_name = None  # must be overridden by subclasses
+    group_name: str | None = None  # must be overridden by subclasses
 
     @cached_property
     def group(self) -> Group:
         """
-        Return the Django Group instance with name `group_name`.
-
-        Cached per request.
+        Return the Group instance for self.group_name, or raise if missing.
         """
-        return Group.objects.get(name=self.group_name)
+        if not self.group_name:
+            raise ImproperlyConfigured(
+                f"{self.__class__.__name__} must define `group_name`."
+            )
+
+        try:
+            return Group.objects.get(name=self.group_name)
+        except Group.DoesNotExist:
+            raise ImproperlyConfigured(
+                f"Required group '{self.group_name}' does not exist. "
+                f"Create it via migration or admin panel."
+            )
+
+    def initial(self, request, *args, **kwargs):
+        """
+        Runs DRF's auth/perm/throttle plus group validation.
+        """
+        super().initial(request, *args, **kwargs)
+
+        # Skip group validation for unmapped methods (will return normal 405),
+        # and for meta methods like OPTIONS/HEAD
+        if self.action is None or request.method in ("OPTIONS", "HEAD"):
+            return
+
+        # Validate & cache the group
+        _ = self.group
 
     def get_queryset(self):
         """
         Return users in the group, ordered by ID.
         """
-        return User.objects.filter(groups__name=self.group_name).order_by("id")
+        return User.objects.filter(groups__id=self.group.id).order_by("id").distinct()
 
     def get_serializer_class(self):
         """
-        Use `AddUserToGroupSerializer` for create;
-        `GroupUserSerializer` for all other actions.
+        Use `UsernameLookupSerializer` for create;
+        `UserSerializer` for all other actions.
         """
         if self.action == "create":
-            return AddUserToGroupSerializer
-        return GroupUserSerializer
+            return UsernameLookupSerializer
+        return UserSerializer
 
     def create(self, request, *args, **kwargs):
         """
@@ -57,13 +81,13 @@ class GroupMembershipViewSet(
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        user = serializer.context["user_instance"]
+        user = serializer.validated_data["user"]
 
         if self.group.user_set.filter(id=user.id).exists():
             return format_response(
                 detail=(
                     f"User '{user.username}' is already "
-                    f"in the {self.group_name} group."
+                    f"in the {self.group.name} group."
                 ),
                 data=None,
                 status=status.HTTP_409_CONFLICT,
@@ -73,8 +97,8 @@ class GroupMembershipViewSet(
 
         return format_response(
             detail=(
-                f"User '{user.username}' successfully added"
-                f"to the {self.group_name} group."
+                f"User '{user.username}' successfully added "
+                f"to the {self.group.name} group."
             ),
             data=None,
             status=status.HTTP_201_CREATED,
