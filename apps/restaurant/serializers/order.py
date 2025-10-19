@@ -7,6 +7,7 @@ from rest_framework import serializers
 
 from apps.core.serializers.mixins import StrictFieldsMixin
 from apps.users.roles import Role
+from apps.users.serializers import UserSerializer
 
 from ..models import Order, OrderItem
 from ..serializers.menu import MenuItemTinySerializer
@@ -52,23 +53,13 @@ class OrderResponseSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
-class OrderUserSerializer(serializers.ModelSerializer):
-    """
-    Minimal user details for embedding in orders.
-    """
-
-    class Meta:
-        model = User
-        fields = ("id", "username")
-
-
 class ManagerOrderResponseSerializer(OrderResponseSerializer):
     """
     Adds user and delivery-crew details for manager views.
     """
 
-    user = OrderUserSerializer(read_only=True)
-    delivery_crew = OrderUserSerializer(read_only=True)
+    user = UserSerializer(read_only=True)
+    delivery_crew = UserSerializer(read_only=True)
 
     class Meta(OrderResponseSerializer.Meta):
         fields = OrderResponseSerializer.Meta.fields + ("user", "delivery_crew")
