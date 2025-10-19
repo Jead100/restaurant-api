@@ -3,7 +3,9 @@ from .roles import (
     IsCustomer,
     IsDeliveryCrew,
     IsManagerOrDeliveryCrew,
+    IsManagerOrAdminUser,
     IsManagerOrReadOnly,
+    IsManagerForReadOnlyOrAdminUser,
 )
 from .demo import IsActiveDemo
 
@@ -13,6 +15,8 @@ __all__ = [
     "IsCustomer",
     "IsDeliveryCrew",
     "IsManagerOrDeliveryCrew",
+    "IsManagerOrAdminUser",
     "IsManagerOrReadOnly",
+    "IsManagerForReadOnlyOrAdminUser",
     "IsActiveDemo",
 ]

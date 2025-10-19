@@ -6,21 +6,22 @@ from apps.core.pagination import CustomPageNumberPagination
 from apps.core.responses import format_response
 from apps.restaurant.models import Order
 
-from ..permissions import IsManager
+from ..permissions import IsManagerOrAdminUser, IsManagerForReadOnlyOrAdminUser
 from ..viewsets import GroupMembershipViewSet
+from ..roles import Role
 
 
 class ManagerGroupViewSet(GroupMembershipViewSet):
     """
     Viewset for managing users in the 'Manager' group.
 
-    Only managers can list, add, retrieve, or remove users
-    from the group.
+    Managers can only list or retrieve users in the group.
+    Admin users can do all: list, retrieve, add, or remove managers.
     """
 
-    group_name = "Manager"
+    group_name = str(Role.MANAGER.label)
 
-    permission_classes = [IsAuthenticated, IsManager]
+    permission_classes = [IsAuthenticated, IsManagerForReadOnlyOrAdminUser]
     throttle_classes = [AnonRateThrottle, UserRateThrottle]
     pagination_class = CustomPageNumberPagination
 
@@ -31,12 +32,13 @@ class DeliveryCrewGroupViewSet(GroupMembershipViewSet):
     """
     Viewset for managing users in the 'Delivery crew' group.
 
-    Only managers can add, retrieve, list, or remove delivery crew members.
+    Only managers or admin users can add, retrieve, list,
+    or remove delivery crew members.
     """
 
-    group_name = "Delivery crew"
+    group_name = str(Role.DELIVERY_CREW.label)
 
-    permission_classes = [IsAuthenticated, IsManager]
+    permission_classes = [IsAuthenticated, IsManagerOrAdminUser]
     throttle_classes = [AnonRateThrottle, UserRateThrottle]
     pagination_class = CustomPageNumberPagination
 
