@@ -1,6 +1,6 @@
-from .groups import GroupUserSerializer, AddUserToGroupSerializer
+from .users import UserSerializer, UsernameLookupSerializer
 
 __all__ = [
-    "GroupUserSerializer",
-    "AddUserToGroupSerializer",
+    "UserSerializer",
+    "UsernameLookupSerializer",
 ]
