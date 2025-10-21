@@ -6,17 +6,21 @@ from apps.core.pagination import CustomPageNumberPagination
 from apps.core.responses import format_response
 from apps.restaurant.models import Order
 
+from ..mixins.demo import GroupDemoGuardMixin
 from ..permissions import IsManagerOrAdminUser, IsManagerForReadOnlyOrAdminUser
-from ..viewsets import GroupMembershipViewSet
 from ..roles import Role
+from ..viewsets import GroupMembershipViewSet
 
 
-class ManagerGroupViewSet(GroupMembershipViewSet):
+class ManagerGroupViewSet(
+    GroupDemoGuardMixin,  # demo support
+    GroupMembershipViewSet,
+):
     """
     Viewset for managing users in the 'Manager' group.
 
     Managers can only list or retrieve users in the group.
-    Admin users can do all: list, retrieve, add, or remove managers.
+    Admin users can do more: list, retrieve, add, or remove managers.
     """
 
     group_name = str(Role.MANAGER.label)
@@ -28,7 +32,10 @@ class ManagerGroupViewSet(GroupMembershipViewSet):
     resource_name = "Manager"
 
 
-class DeliveryCrewGroupViewSet(GroupMembershipViewSet):
+class DeliveryCrewGroupViewSet(
+    GroupDemoGuardMixin,
+    GroupMembershipViewSet,
+):
     """
     Viewset for managing users in the 'Delivery crew' group.
 
@@ -53,11 +60,11 @@ class DeliveryCrewGroupViewSet(GroupMembershipViewSet):
         """
         user = self.get_object()
         Order.objects.filter(delivery_crew=user).update(delivery_crew=None)
-        self.group.user_set.remove(user)
+        self.perform_destroy(user)  # remove from group
         return format_response(
             detail=(
                 f"User '{user.username}' successfully removed "
-                f"from the {self.group_name} group."
+                f"from the {self.group.name} group."
             ),
             data=None,
             status=status.HTTP_200_OK,

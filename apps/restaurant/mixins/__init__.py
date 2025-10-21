@@ -1,3 +1,3 @@
-from .demo import DemoScopeMixin
+from .demo import RestaurantDemoGuardMixin
 
-__all__ = ["DemoScopeMixin"]
+__all__ = ["RestaurantDemoGuardMixin"]

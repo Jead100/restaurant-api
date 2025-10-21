@@ -7,7 +7,7 @@ from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 
 from apps.core.pagination import CustomPageNumberPagination
 from apps.core.responses import format_response
-from apps.restaurant.mixins import DemoScopeMixin
+from apps.restaurant.mixins import RestaurantDemoGuardMixin
 from apps.users.permissions import IsCustomer
 
 from ..models import Cart
@@ -19,7 +19,7 @@ from ..serializers.cart import (
 from ..viewsets import RestaurantBaseViewSet
 
 
-class CartViewSet(DemoScopeMixin, RestaurantBaseViewSet):
+class CartViewSet(RestaurantDemoGuardMixin, RestaurantBaseViewSet):
     """
     Viewset for managing a user's cart.
 

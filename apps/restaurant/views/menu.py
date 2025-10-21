@@ -13,7 +13,7 @@ from drf_spectacular.utils import (
 
 from apps.core.pagination import CustomPageNumberPagination
 from apps.core.schema.responses import wrapped_response, SimpleDetailResponseSerializer
-from apps.restaurant.mixins import DemoScopeMixin
+from apps.restaurant.mixins import RestaurantDemoGuardMixin
 from apps.users.permissions import IsManagerOrReadOnly
 
 from ..filters import StrictOrderingFilter
@@ -89,7 +89,7 @@ from ..viewsets import RestaurantBaseViewSet
         responses={200: SimpleDetailResponseSerializer},
     ),
 )
-class MenuItemViewSet(DemoScopeMixin, RestaurantBaseViewSet):
+class MenuItemViewSet(RestaurantDemoGuardMixin, RestaurantBaseViewSet):
     """
     Viewset for managing menu items.
 
@@ -130,7 +130,7 @@ class MenuItemViewSet(DemoScopeMixin, RestaurantBaseViewSet):
         return self.res_serializer_cls
 
 
-class CategoryViewSet(DemoScopeMixin, RestaurantBaseViewSet):
+class CategoryViewSet(RestaurantDemoGuardMixin, RestaurantBaseViewSet):
     """
     Viewset for managing menu item categories.
 

@@ -14,9 +14,7 @@ from .serializers.users import UserSerializer, UsernameLookupSerializer
 
 class GroupMembershipViewSet(
     model_mixins.CustomListModelMixin,
-    model_mixins.CustomCreateModelMixin,
     model_mixins.CustomRetrieveModelMixin,
-    model_mixins.CustomDestroyModelMixin,
     ExtendedGenericViewSet,
 ):
     """
@@ -74,6 +72,15 @@ class GroupMembershipViewSet(
             return UsernameLookupSerializer
         return UserSerializer
 
+    def perform_create(self, serializer):
+        # Add the validated user to the group
+        user = serializer.validated_data["user"]
+        self.group.user_set.add(user)
+
+    def perform_destroy(self, instance):
+        # Remove the specified user instance from the group
+        self.group.user_set.remove(instance)
+
     def create(self, request, *args, **kwargs):
         """
         Add user to the group if not already a member.
@@ -93,7 +100,7 @@ class GroupMembershipViewSet(
                 status=status.HTTP_409_CONFLICT,
             )
 
-        self.group.user_set.add(user)
+        self.perform_create(serializer)
 
         return format_response(
             detail=(
@@ -109,12 +116,12 @@ class GroupMembershipViewSet(
         Remove user from the group.
         """
         user = self.get_object()
-        self.group.user_set.remove(user)
+        self.perform_destroy(user)
 
         return format_response(
             detail=(
                 f"User '{user.username}' successfully removed "
-                f"from the {self.group_name} group."
+                f"from the {self.group.name} group."
             ),
             data=None,
             status=status.HTTP_200_OK,
