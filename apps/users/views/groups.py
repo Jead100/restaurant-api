@@ -1,14 +1,18 @@
 from rest_framework import status
+from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 
+from apps.core.mixins.message import ResponseMessageMixin
 from apps.core.pagination import CustomPageNumberPagination
 from apps.core.responses import format_response
 from apps.restaurant.models import Order
 
-from ..mixins.demo import GroupDemoGuardMixin
+from ..mixins.demo import DemoUserAccessMixin, GroupDemoGuardMixin
+from ..models import User
 from ..permissions import IsManagerOrAdminUser, IsManagerForReadOnlyOrAdminUser
 from ..roles import Role
+from ..serializers import UserSerializer
 from ..viewsets import GroupMembershipViewSet
 
 
@@ -69,3 +73,24 @@ class DeliveryCrewGroupViewSet(
             data=None,
             status=status.HTTP_200_OK,
         )
+
+
+class CustomerListAPIView(
+    DemoUserAccessMixin,  # demo support
+    ResponseMessageMixin,  # for `resource_name` support
+    ListAPIView,
+):
+    """
+    API view for listing all customers (i.e., users that don't belong to a group).
+
+    Accessible by authenticated users with manager or admin roles.
+    """
+
+    queryset = User.objects.filter(groups__isnull=True).exclude(
+        is_superuser=True
+    )  # exclude admin-level users
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated, IsManagerOrAdminUser]
+    throttle_classes = [AnonRateThrottle, UserRateThrottle]
+    pagination_class = CustomPageNumberPagination
+    resource_name = "Customer"
