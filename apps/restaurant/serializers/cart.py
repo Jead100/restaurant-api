@@ -61,8 +61,13 @@ class CartCreateSerializer(StrictFieldsMixin, serializers.ModelSerializer):
     def create(self, validated_data):
         # Get user from the request context for creating the cart line
         user = self.context["request"].user
-        menuitem = validated_data["menuitem"]
-        qty = validated_data["quantity"]
+
+        # Extract validated user-provided data
+        menuitem = validated_data.pop("menuitem")
+        qty = validated_data.pop("quantity")
+
+        # Capture any additional fields injected internally (e.g., by a mixin)
+        extra = dict(validated_data)
 
         return Cart.objects.create(
             user=user,
@@ -70,6 +75,7 @@ class CartCreateSerializer(StrictFieldsMixin, serializers.ModelSerializer):
             quantity=qty,
             unit_price=menuitem.price,
             price=menuitem.price * qty,
+            **extra
         )
 
 
