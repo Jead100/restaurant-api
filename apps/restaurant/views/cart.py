@@ -1,5 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 
+from rest_framework import filters
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -10,6 +11,7 @@ from apps.core.responses import format_response
 from apps.restaurant.mixins import RestaurantDemoGuardMixin
 from apps.users.permissions import IsCustomer
 
+from ..filters import StrictOrderingFilter
 from ..models import Cart
 from ..serializers.cart import (
     CartCreateSerializer,
@@ -32,6 +34,11 @@ class CartViewSet(RestaurantDemoGuardMixin, RestaurantBaseViewSet):
 
     permission_classes = [IsAuthenticated, IsCustomer]
     throttle_classes = [AnonRateThrottle, UserRateThrottle]
+
+    filter_backends = [StrictOrderingFilter, filters.SearchFilter]
+    search_fields = ["menuitem__title"]
+    ordering_fields = ["price", "id"]
+    ordering = ["id"]
     pagination_class = CustomPageNumberPagination
 
     # Read-only serializer used for list/retrieve responses and
