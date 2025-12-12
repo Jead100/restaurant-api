@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -154,42 +155,43 @@ class OrderViewSet(RestaurantDemoGuardMixin, RestaurantBaseViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Create an order; delivery_crew remains unassigned
-        order = Order.objects.create(
-            user=user,
-            total=0,  # will be updated after calculating item totals
-            date=timezone.now().date(),
-        )
-
-        # Use DemoScopeMixin helper _is_demo_mode_enabled() to
-        # check if the order was created in a demo sandbox
-        if self._is_demo_mode_enabled:
-            order.is_demo = True
-
-        # Prepare order items and calculate order total
-        total_order_price = 0
-        order_items_to_create = []
-        for cart_item in cart_items:
-            order_item = OrderItem(
-                order=order,
-                menuitem=cart_item.menuitem,
-                item_title=cart_item.menuitem.title,
-                quantity=cart_item.quantity,
-                unit_price=cart_item.unit_price,
-                price=cart_item.price,
+        with transaction.atomic():
+            # Create an order; delivery_crew remains unassigned
+            order = Order.objects.create(
+                user=user,
+                total=0,  # will be updated after calculating item totals
+                date=timezone.now().date(),
             )
-            order_items_to_create.append(order_item)
-            total_order_price += cart_item.price
 
-        # Bulk create all order items for efficiency
-        OrderItem.objects.bulk_create(order_items_to_create)
+            # Use DemoScopeMixin helper _is_demo_mode_enabled() to
+            # check if the order was created in a demo sandbox
+            if self._is_demo_mode_enabled:
+                order.is_demo = True
 
-        # Update the order total and save
-        order.total = total_order_price
-        order.save()
+            # Prepare order items and calculate order total
+            total_order_price = 0
+            order_items_to_create = []
+            for cart_item in cart_items:
+                order_item = OrderItem(
+                    order=order,
+                    menuitem=cart_item.menuitem,
+                    item_title=cart_item.menuitem.title,
+                    quantity=cart_item.quantity,
+                    unit_price=cart_item.unit_price,
+                    price=cart_item.price,
+                )
+                order_items_to_create.append(order_item)
+                total_order_price += cart_item.price
 
-        # Clear user's cart after successful order creation
-        cart_items.delete()
+            # Bulk create all order items for efficiency
+            OrderItem.objects.bulk_create(order_items_to_create)
+
+            # Update the order total and save
+            order.total = total_order_price
+            order.save()
+
+            # Clear user's cart after successful order creation
+            cart_items.delete()
 
         # Return the created order
         res_serializer = self.res_serializer_cls(order)
