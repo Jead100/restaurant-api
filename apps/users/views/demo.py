@@ -130,7 +130,7 @@ class DemoTokenRefreshView(TokenRefreshView):
     hasn't expired.
     """
 
-    permissions_classes = [IsAuthenticated, IsActiveDemo]
+    permission_classes = [AllowAny]
     throttle_classes = [AnonRateThrottle, UserRateThrottle]
     serializer_class = DemoSafeTokenRefreshSerializer
 
