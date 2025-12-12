@@ -25,6 +25,8 @@ from ..serializers.demo import (
     DemoLogoutSerializer,
 )
 
+User = get_user_model()
+
 
 class DemoLoginView(APIView):
     """
@@ -35,7 +37,6 @@ class DemoLoginView(APIView):
     permission_classes = [AllowAny]
     throttle_classes = [AnonRateThrottle, UserRateThrottle]
 
-    @transaction.atomic
     def post(self, request, *args, **kwargs):
         if not getattr(settings, "DEMO_MODE", False):
             return Response(
@@ -53,33 +54,33 @@ class DemoLoginView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Create user with a unique username
-        random_suffix = secrets.token_urlsafe(8)[:9].lower()  # URL-safe-ish short ID
-        username = f"demo_{random_suffix}"
-        password = secrets.token_urlsafe(16)
-        User = get_user_model()
-        user = User.objects.create_user(
-            username=username, password=password, email=f"{username}@demo-invalid.com"
-        )
+        with transaction.atomic():
+            # Create user with a unique username
+            random_suffix = secrets.token_urlsafe(8)[:9].lower()
+            username = f"demo_{random_suffix}"
+            password = secrets.token_urlsafe(16)
+            user = User.objects.create_user(
+                username=username,
+                password=password,
+                email=f"{username}@demo-invalid.com",
+            )
 
-        ttl_hours = int(getattr(settings, "DEMO_USER_TTL_HOURS", 12))
-        demo_expires_at = timezone.now() + timedelta(hours=ttl_hours)
+            ttl_hours = settings.DEMO_USER_TTL_HOURS
+            demo_expires_at = timezone.now() + timedelta(hours=ttl_hours)
 
-        # Mark user as demo + set expiry
-        if hasattr(user, "is_demo"):
-            user.is_demo = True
-        if hasattr(user, "demo_expires_at"):
-            user.demo_expires_at = demo_expires_at
-        user.save(update_fields=["is_demo", "demo_expires_at"] or None)
+            # Mark user as demo + set expiry
+            if hasattr(user, "is_demo"):
+                user.is_demo = True
+            if hasattr(user, "demo_expires_at"):
+                user.demo_expires_at = demo_expires_at
+            user.save(update_fields=["is_demo", "demo_expires_at"] or None)
 
-        # Assign group if not a customer (customers don't belong to one)
-        if role_enum != Role.CUSTOMER:
-            group, _ = Group.objects.get_or_create(
-                name=role_enum.label
-            )  # "Manager" / "Delivery crew"
-            user.groups.add(group)
-
-        role = role_enum.value  # 'manager' | 'delivery_crew' | 'customer'
+            # Assign group if not a customer (customers don't belong to one)
+            if role_enum != Role.CUSTOMER:
+                group, _ = Group.objects.get_or_create(
+                    name=role_enum.label
+                )  # "Manager" / "Delivery crew"
+                user.groups.add(group)
 
         # Issue JWTs with demo-specific lifetime caps
         refresh = RefreshToken.for_user(user)
@@ -93,6 +94,7 @@ class DemoLoginView(APIView):
         access = refresh.access_token
         access.set_exp(lifetime=min(DEMO_ACCESS_MAX, timedelta(seconds=remaining)))
 
+        role = role_enum.value
         data = {
             "detail": f"Temporary '{role}' account created. Expires in {ttl_hours}h.",
             "user": {
