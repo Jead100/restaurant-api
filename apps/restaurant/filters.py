@@ -3,7 +3,7 @@ import django_filters
 from rest_framework import filters
 from rest_framework.exceptions import ValidationError
 
-from apps.users.roles import get_user_role
+from apps.users.roles import resolve_user_roles
 
 from .models import Order
 
@@ -122,7 +122,7 @@ class OrderFilter(django_filters.FilterSet):
         """
         Check if the current user has manager role.
         """
-        return get_user_role(self.request.user) == "manager"
+        return resolve_user_roles(self.request.user)[0] == "manager"
 
     def _filter_by_user_field(self, queryset, field_name: str, value: str):
         """

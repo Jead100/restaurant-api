@@ -12,7 +12,7 @@ from apps.core.pagination import CustomPageNumberPagination
 from apps.core.responses import format_response
 from apps.restaurant.mixins import RestaurantDemoGuardMixin
 from apps.users.permissions import IsCustomer, IsManager, IsManagerOrDeliveryCrew
-from apps.users.roles import get_user_role
+from apps.users.roles import resolve_user_roles
 
 
 from ..filters import OrderFilter, StrictOrderingFilter
@@ -31,7 +31,7 @@ class OrderViewSet(RestaurantDemoGuardMixin, RestaurantBaseViewSet):
     Viewset for managing customer orders.
 
     Supports listing, retrieving, creating, and updating orders
-    based on user role, enforced by `HasPermissionToOrderAction`.
+    based on user role.
 
     Managers can view and update all orders, assign delivery crew,
     and change order statuses. Delivery crew can view and update their
@@ -62,7 +62,8 @@ class OrderViewSet(RestaurantDemoGuardMixin, RestaurantBaseViewSet):
 
     @cached_property
     def user_role(self):
-        return get_user_role(self.request.user)
+        # Primary user role
+        return resolve_user_roles(self.request.user)[0]
 
     @property
     def res_serializer_cls(self):
@@ -111,7 +112,7 @@ class OrderViewSet(RestaurantDemoGuardMixin, RestaurantBaseViewSet):
         return context
 
     def get_queryset(self):
-        # Return a filtered queryset based on the user's role.
+        # Return a filtered queryset based on the user's primary role.
         # Managers see all orders, delivery crew see assigned orders,
         # and customers see only their own orders.
         qs = Order.objects.all().prefetch_related("order_items__menuitem")

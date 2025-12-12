@@ -1,3 +1,5 @@
+from typing import List
+
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 
@@ -6,7 +8,9 @@ from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from rest_framework_simplejwt.settings import api_settings
 
-from ..roles import Role
+from ..roles import resolve_user_roles
+
+User = get_user_model()
 
 
 class DemoMeSerializer(serializers.ModelSerializer):
@@ -20,38 +24,24 @@ class DemoMeSerializer(serializers.ModelSerializer):
     expires_at = serializers.DateTimeField(source="demo_expires_at", read_only=True)
 
     # Computed fields
-    role = serializers.SerializerMethodField()
+    roles = serializers.SerializerMethodField()
     ttl_seconds_remaining = serializers.SerializerMethodField()
     ttl_hint = serializers.SerializerMethodField()
 
     class Meta:
-        model = get_user_model()
+        model = User
         fields = (
             "username",
             "is_demo",
             "expires_at",
-            "role",
+            "roles",
             "ttl_seconds_remaining",
             "ttl_hint",
         )
         read_only_fields = fields
 
-    def get_role(self, obj) -> str:
-        # Prefer a canonical user.role if present
-        candidate = getattr(obj, "role", None)
-        if isinstance(candidate, str) and candidate:
-            return candidate
-
-        # Fallback: infer from groups
-        try:
-            names = set(obj.groups.values_list("name", flat=True))
-        except Exception:
-            names = set()
-        if Role.MANAGER.label in names:
-            return Role.MANAGER.value
-        if Role.DELIVERY_CREW.label in names:
-            return Role.DELIVERY_CREW.value
-        return Role.CUSTOMER.value
+    def get_roles(self, obj) -> List[str]:
+        return resolve_user_roles(obj)
 
     def get_ttl_seconds_remaining(self, obj) -> int | None:
         expires_at = getattr(obj, "demo_expires_at", None)
@@ -95,7 +85,6 @@ class DemoSafeTokenRefreshSerializer(TokenRefreshSerializer):
 
         # Check demo status & expiry before rotating/issuing.
         now = timezone.now()
-        User = get_user_model()
         is_valid_demo = User.objects.filter(
             **{
                 api_settings.USER_ID_FIELD: user_id,
