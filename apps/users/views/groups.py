@@ -1,3 +1,5 @@
+from django.contrib.auth import get_user_model
+
 from rest_framework import status
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -9,11 +11,12 @@ from apps.core.responses import format_response
 from apps.restaurant.models import Order
 
 from ..mixins.demo import DemoUserAccessMixin, GroupDemoGuardMixin
-from ..models import User
 from ..permissions import IsManagerOrAdminUser, IsManagerForReadOnlyOrAdminUser
 from ..roles import Role
 from ..serializers import UserSerializer
 from ..viewsets import GroupMembershipViewSet
+
+User = get_user_model()
 
 
 class ManagerGroupViewSet(

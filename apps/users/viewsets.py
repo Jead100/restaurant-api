@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import cached_property
@@ -8,8 +9,9 @@ from apps.core.mixins import model_mixins
 from apps.core.responses import format_response
 from apps.core.viewsets import ExtendedGenericViewSet
 
-from .models import User
 from .serializers.users import UserSerializer, UsernameLookupSerializer
+
+User = get_user_model()
 
 
 class GroupMembershipViewSet(

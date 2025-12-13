@@ -1,6 +1,6 @@
 [
     {
-        "model": "users.user",
+        "model": "users.customuser",
         "pk": 1,
         "fields": {
             "password": "pbkdf2_sha256$1000000$uFB6SdA9cIYVWBKCxOGoaV$cIIW4G99ysvznQ4o4yvPNHtiSnAIZeI9TKJWVEmQNQA=",
@@ -21,7 +21,7 @@
         }
     },
     {
-        "model": "users.user",
+        "model": "users.customuser",
         "pk": 2,
         "fields": {
             "password": "pbkdf2_sha256$1000000$4OowmrjLuIy6bXl7yTBM6v$W77pt3U7ILXDQZ2FDDWsoL8241V/RPCGV3EEtkiuPNo=",
@@ -44,7 +44,7 @@
         }
     },
     {
-        "model": "users.user",
+        "model": "users.customuser",
         "pk": 3,
         "fields": {
             "password": "pbkdf2_sha256$1000000$PSmS7ResHYLrXvZ1bULVOW$HW/TYeeo0qmEhEkhPLBG56kqmYzmAyiEWtjrE3YAneg=",
@@ -67,7 +67,7 @@
         }
     },
     {
-        "model": "users.user",
+        "model": "users.customuser",
         "pk": 4,
         "fields": {
             "password": "pbkdf2_sha256$1000000$nt2lUNB9CIRPJtHCXWuH6z$zUJsUr12Dp8ej05BLylq5Uv8Ynyfa3jjtHTC/XvHRJA=",
@@ -88,7 +88,7 @@
         }
     },
     {
-        "model": "users.user",
+        "model": "users.customuser",
         "pk": 21,
         "fields": {
             "password": "pbkdf2_sha256$1000000$loBMzzkMKDBJa3JWI0veCd$qN4h2/f9Wy7qmsEUJXpiV0j7dnKaWJEd51KIG6J9aV4=",
@@ -441,7 +441,7 @@
         "model": "restaurant.order",
         "pk": 1,
         "fields": {
-            "is_demo": true,
+            "is_demo": false,
             "user": 4,
             "delivery_crew": 3,
             "status": false,
@@ -453,7 +453,7 @@
         "model": "restaurant.order",
         "pk": 2,
         "fields": {
-            "is_demo": true,
+            "is_demo": false,
             "user": 4,
             "delivery_crew": 3,
             "status": true,

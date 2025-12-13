@@ -13,7 +13,7 @@ class CustomUserManager(UserManager.from_queryset(DemoUserQuerySet)):
     pass
 
 
-class User(DemoUserMixin, AbstractUser):
+class CustomUser(DemoUserMixin, AbstractUser):
     """
     Custom user model that includes demo account fields and a UUID identifier.
     """
@@ -26,6 +26,11 @@ class User(DemoUserMixin, AbstractUser):
     )
 
     objects = CustomUserManager()
+
+    class Meta(AbstractUser.Meta):
+        db_table = "users_user"
+        verbose_name = "User"
+        verbose_name_plural = "Users"
 
     def __str__(self):
         return self.username
