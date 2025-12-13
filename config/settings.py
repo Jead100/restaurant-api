@@ -172,9 +172,15 @@ if DEBUG:
 
 AUTH_USER_MODEL = "users.CustomUser"
 
+ACCESS_TOKEN_LIFETIME_MINUTES = config(
+    "ACCESS_TOKEN_LIFETIME_MINUTES", cast=int, default=30
+)
+REFRESH_TOKEN_LIFETIME_HOURS = config(
+    "REFRESH_TOKEN_LIFETIME_HOURS", cast=int, default=168  # 7 days
+)
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=ACCESS_TOKEN_LIFETIME_MINUTES),
+    "REFRESH_TOKEN_LIFETIME": timedelta(hours=REFRESH_TOKEN_LIFETIME_HOURS),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
     "LEEWAY": 30,

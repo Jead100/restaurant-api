@@ -82,23 +82,29 @@ class DemoLoginView(APIView):
                 )  # "Manager" / "Delivery crew"
                 user.groups.add(group)
 
-        # Issue JWTs with demo-specific lifetime caps
+        # Issue JWTs and ensure they never outlive the demo account or
+        # the global token lifetime limits
         refresh = RefreshToken.for_user(user)
-
-        DEMO_REFRESH_MAX = timedelta(hours=1)
-        DEMO_ACCESS_MAX = timedelta(minutes=15)
         remaining = (demo_expires_at - timezone.now()).total_seconds()
-
-        # Ensure tokens never outlive the demo account or their respective caps
-        refresh.set_exp(lifetime=min(DEMO_REFRESH_MAX, timedelta(seconds=remaining)))
+        refresh.set_exp(
+            lifetime=min(
+                settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"],
+                timedelta(seconds=remaining),
+            )
+        )
         access = refresh.access_token
-        access.set_exp(lifetime=min(DEMO_ACCESS_MAX, timedelta(seconds=remaining)))
+        access.set_exp(
+            lifetime=min(
+                settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
+                timedelta(seconds=remaining),
+            )
+        )
 
         role = role_enum.value
         data = {
             "detail": f"Temporary '{role}' account created. Expires in {ttl_hours}h.",
             "user": {
-                "username": username,
+                "username": user.username,
                 "role": role,
                 "expires_at": demo_expires_at.isoformat(),
             },
