@@ -7,6 +7,15 @@ from rest_framework import serializers
 from ..models import MenuItem, Category
 
 
+# Helper to build a standard {"self": "<absolute-url>"} dictionary
+def _build_self_link(request, view_name: str, lookup_value):
+    return {
+        "self": request.build_absolute_uri(
+            reverse(view_name, args=[lookup_value]),
+        ),
+    }
+
+
 class CategorySerializer(serializers.ModelSerializer):
     """
     Serializer for menu categories (e.g., desserts, appetizers).
@@ -20,12 +29,9 @@ class CategorySerializer(serializers.ModelSerializer):
         read_only_fields = ("id", "links")
 
     def get_links(self, obj):
-        request = self.context.get("request")
-        return {
-            "self": request.build_absolute_uri(
-                reverse("restaurant:category-detail", args=[obj.slug])
-            )
-        }
+        return _build_self_link(
+            self.context.get("request"), "restaurant:category-detail", obj.slug
+        )
 
 
 class CategoryTinySerializer(serializers.ModelSerializer):
@@ -42,12 +48,9 @@ class CategoryTinySerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
     def get_links(self, obj):
-        request = self.context.get("request")
-        return {
-            "self": request.build_absolute_uri(
-                reverse("restaurant:category-detail", args=[obj.slug])
-            )
-        }
+        return _build_self_link(
+            self.context.get("request"), "restaurant:category-detail", obj.slug
+        )
 
 
 class MenuItemResponseSerializer(serializers.HyperlinkedModelSerializer):
@@ -60,12 +63,9 @@ class MenuItemResponseSerializer(serializers.HyperlinkedModelSerializer):
         read_only_fields = fields
 
     def get_links(self, obj):
-        request = self.context.get("request")
-        return {
-            "self": request.build_absolute_uri(
-                reverse("restaurant:menuitem-detail", args=[obj.pk])
-            )
-        }
+        return _build_self_link(
+            self.context.get("request"), "restaurant:menuitem-detail", obj.pk
+        )
 
 
 class MenuItemWriteSerializer(serializers.ModelSerializer):
