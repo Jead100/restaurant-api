@@ -32,6 +32,7 @@ class Category(DemoTrackedModel):
 
     class Meta:
         verbose_name_plural = "categories"
+        ordering = ["title"]
 
     def __str__(self):
         return self.title
@@ -65,6 +66,7 @@ class MenuItem(DemoTrackedModel):
 
     class Meta:
         verbose_name_plural = "menu items"
+        ordering = ["-featured", "title"]
 
     def __str__(self):
         return f"{self.title} ({self.category.title})"
