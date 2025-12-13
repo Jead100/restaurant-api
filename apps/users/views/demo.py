@@ -147,7 +147,6 @@ class DemoLogoutView(APIView):
     throttle_classes = [AnonRateThrottle, UserRateThrottle]
     serializer_class = DemoLogoutSerializer
 
-    @transaction.atomic
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
