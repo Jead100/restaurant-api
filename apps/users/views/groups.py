@@ -89,9 +89,11 @@ class CustomerListAPIView(
     Accessible by authenticated users with manager or admin roles.
     """
 
-    queryset = User.objects.filter(groups__isnull=True).exclude(
-        is_superuser=True
-    )  # exclude admin-level users
+    queryset = (
+        User.objects.filter(groups__isnull=True)
+        .exclude(is_superuser=True)  # exclude admin-level users
+        .order_by("id")
+    )
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated, IsManagerOrAdminUser]
     throttle_classes = [AnonRateThrottle, UserRateThrottle]
