@@ -45,14 +45,6 @@ class CartViewSet(RestaurantDemoGuardMixin, RestaurantBaseViewSet):
     # for reserializing output in create/update actions
     res_serializer_cls = CartResponseSerializer
 
-    ACTION_SERIALIZERS = {
-        "list": res_serializer_cls,
-        "create": CartCreateSerializer,
-        "retrieve": res_serializer_cls,
-        "update": CartUpdateSerializer,
-        "partial_update": CartUpdateSerializer,
-    }
-
     # Action-specific success message templates (used by self.msg())
     default_messages = {
         "list": _("{resource_plural} in the cart for user '{username}'."),
@@ -67,9 +59,13 @@ class CartViewSet(RestaurantDemoGuardMixin, RestaurantBaseViewSet):
         return Cart.objects.filter(user=self.request.user).select_related("menuitem")
 
     def get_serializer_class(self):
-        # Return the serializer class based on the current action.
-        # Defaults to the read-only serializer if not explicitly mapped.
-        return self.ACTION_SERIALIZERS.get(self.action, self.res_serializer_cls)
+        # Return the write serializer for create/update actions,
+        # otherwise use the read-only serializer.
+        if self.action == "create":
+            return CartCreateSerializer
+        if self.action in ("update", "partial_update"):
+            return CartUpdateSerializer
+        return self.res_serializer_cls
 
     def get_msg_context(self):
         # Extend message context with username, used in the 'list' message
