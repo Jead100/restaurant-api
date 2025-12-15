@@ -110,12 +110,12 @@ class MenuItemViewSet(RestaurantDemoGuardMixin, RestaurantBaseViewSet):
 
     filter_backends = [DjangoFilterBackend, StrictOrderingFilter, filters.SearchFilter]
     filterset_fields = {
-        "price": ["lte"],  # e.g., ?price__lte=10.0
+        "price": ["lte"],
         "featured": ["exact"],
         "category": ["exact"],
     }
-    ordering_fields = ["id", "title", "price"]
-    search_fields = ["title"]  # e.g., ?search=cake
+    ordering_fields = ["title", "price", "featured", "category__title"]
+    search_fields = ["title", "category__title"]
     pagination_class = CustomPageNumberPagination
 
     # Used in default response messages via `self.msg()`
@@ -149,7 +149,7 @@ class CategoryViewSet(RestaurantDemoGuardMixin, RestaurantBaseViewSet):
 
     filter_backends = [DjangoFilterBackend, StrictOrderingFilter, filters.SearchFilter]
     ordering_fields = ["slug", "title"]
-    search_fields = ["slug"]
+    search_fields = ["slug", "title"]
     pagination_class = CustomPageNumberPagination
 
     resource_name = "Menu category"
