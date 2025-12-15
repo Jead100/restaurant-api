@@ -5,20 +5,61 @@ from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 
+from drf_spectacular.utils import (
+    extend_schema,
+    extend_schema_view,
+)
+
 from apps.core.mixins.message import ResponseMessageMixin
 from apps.core.pagination import CustomPageNumberPagination
 from apps.core.responses import format_response
+from apps.core.schemas import SimpleDetailSerializer
 from apps.restaurant.models import Order
 
 from ..mixins.demo import DemoUserAccessMixin, GroupDemoGuardMixin
 from ..permissions import IsManagerOrAdminUser, IsManagerForReadOnlyOrAdminUser
 from ..roles import Role
+from ..schemas import UserEnvelopeSerializer
 from ..serializers import UserSerializer
 from ..viewsets import GroupMembershipViewSet
 
 User = get_user_model()
 
 
+@extend_schema(tags=["Role Groups"])
+@extend_schema_view(
+    list=extend_schema(
+        summary="Retrieve a list of manager users.",
+        description=(
+            "Returns a paginated list of users in the 'Manager' group.\n\n"
+            "Only managers and admin users can access this endpoint."
+        ),
+    ),
+    retrieve=extend_schema(
+        summary="Retrieve a manager user by ID.",
+        description=(
+            "Returns details for a single user in the 'Manager' group.\n\n"
+            "Only managers and admin users can access this endpoint."
+        ),
+        responses={200: UserEnvelopeSerializer},
+    ),
+    create=extend_schema(
+        summary="Add a user to the Manager group.",
+        description=(
+            "Adds the specified user to the 'Manager' group.\n\n"
+            "Only admin users can perform this action."
+        ),
+        responses={201: SimpleDetailSerializer},
+    ),
+    destroy=extend_schema(
+        summary="Remove a user from the Manager group.",
+        description=(
+            "Removes the specified user from the 'Manager' group.\n\n"
+            "Only admin users can perform this action."
+        ),
+        responses={200: SimpleDetailSerializer},
+    ),
+)
 class ManagerGroupViewSet(
     GroupDemoGuardMixin,  # demo support
     GroupMembershipViewSet,
@@ -39,6 +80,41 @@ class ManagerGroupViewSet(
     resource_name = "Manager"
 
 
+@extend_schema(tags=["Role Groups"])
+@extend_schema_view(
+    list=extend_schema(
+        summary="Retrieve a list of delivery crew users.",
+        description=(
+            "Returns a paginated list of users in the 'Delivery crew' group.\n\n"
+            "Only managers and admin users can access this endpoint."
+        ),
+    ),
+    retrieve=extend_schema(
+        summary="Retrieve a delivery crew user by ID.",
+        description=(
+            "Returns details for a single user in the 'Delivery crew' group.\n\n"
+            "Only managers and admin users can access this endpoint."
+        ),
+        responses={200: UserEnvelopeSerializer},
+    ),
+    create=extend_schema(
+        summary="Add a user to the Delivery crew group.",
+        description=(
+            "Adds the specified user to the 'Delivery crew' group.\n\n"
+            "Only managers and admin users can perform this action."
+        ),
+        responses={201: SimpleDetailSerializer},
+    ),
+    destroy=extend_schema(
+        summary="Remove a user from the Delivery crew group.",
+        description=(
+            "Removes the specified user from the 'Delivery crew' group and "
+            "clears any orders assigned to them.\n\n"
+            "Only managers and admin users can perform this action."
+        ),
+        responses={200: SimpleDetailSerializer},
+    ),
+)
 class DeliveryCrewGroupViewSet(
     GroupDemoGuardMixin,
     GroupMembershipViewSet,
@@ -78,6 +154,15 @@ class DeliveryCrewGroupViewSet(
         )
 
 
+@extend_schema(
+    tags=["Role Groups"],
+    summary="Retrieve a list of all customers.",
+    description=(
+        "Returns a paginated list of customer users (users that do not belong "
+        "to any role group and are not superusers).\n\n"
+        "Only managers and admin users can access this endpoint."
+    ),
+)
 class CustomerListAPIView(
     DemoUserAccessMixin,  # demo support
     ResponseMessageMixin,  # for `resource_name` support

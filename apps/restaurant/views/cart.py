@@ -6,9 +6,16 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 
+from drf_spectacular.utils import (
+    extend_schema,
+    extend_schema_view,
+)
+
 from apps.core.pagination import CustomPageNumberPagination
 from apps.core.responses import format_response
+from apps.core.schemas import SimpleDetailSerializer
 from apps.restaurant.mixins import RestaurantDemoGuardMixin
+from apps.restaurant.schemas import CartItemEnvelopeSerializer
 from apps.users.permissions import IsCustomer
 
 from ..filters import StrictOrderingFilter
@@ -21,6 +28,51 @@ from ..serializers.cart import (
 from ..viewsets import RestaurantBaseViewSet
 
 
+@extend_schema(tags=["Cart"])
+@extend_schema_view(
+    list=extend_schema(
+        summary="Retrieve a list of all cart items.",
+        description=(
+            "Returns a paginated list of cart items belonging to the "
+            "authenticated customer.\n\n"
+            "Supports searching by menu item title and ordering by `price` or `id`."
+        ),
+    ),
+    retrieve=extend_schema(
+        summary="Retrieve a cart item by ID.",
+        description=(
+            "Returns detailed information for a single cart item belonging "
+            "to the authenticated customer."
+        ),
+        responses={200: CartItemEnvelopeSerializer},
+    ),
+    create=extend_schema(
+        summary="Add a new item to the cart.",
+        description=(
+            "Creates a new cart item for the authenticated customer.\n\n"
+            "Only authenticated customers can perform this action."
+        ),
+        responses={201: CartItemEnvelopeSerializer},
+    ),
+    update=extend_schema(exclude=True),
+    partial_update=extend_schema(
+        summary="Partially update a cart item.",
+        description=(
+            "Updates one or more fields of an existing cart item.\n\n"
+            "Only authenticated customers can perform this action."
+        ),
+        responses={200: CartItemEnvelopeSerializer},
+    ),
+    destroy=extend_schema(
+        summary="Delete a cart item.",
+        description=(
+            "Permanently removes a cart item from the authenticated "
+            "customer's cart.\n\n"
+            "Only authenticated customers can perform this action."
+        ),
+        responses={200: SimpleDetailSerializer},
+    ),
+)
 class CartViewSet(RestaurantDemoGuardMixin, RestaurantBaseViewSet):
     """
     Viewset for managing a user's cart.
@@ -31,6 +83,9 @@ class CartViewSet(RestaurantDemoGuardMixin, RestaurantBaseViewSet):
     Each cart is user-specific and scoped to the authenticated customer,
     enforced by `IsCustomer` permission.
     """
+
+    # Base queryset; for schema/model introspection
+    queryset = Cart.objects.all()
 
     permission_classes = [IsAuthenticated, IsCustomer]
     throttle_classes = [AnonRateThrottle, UserRateThrottle]
@@ -74,6 +129,14 @@ class CartViewSet(RestaurantDemoGuardMixin, RestaurantBaseViewSet):
         context["username"] = self.request.user.username
         return context
 
+    @extend_schema(
+        summary="Clear all items from the cart.",
+        description=(
+            "Deletes all items from the authenticated customer's cart.\n\n"
+            "Only authenticated customers can perform this action."
+        ),
+        responses={200: SimpleDetailSerializer},
+    )
     @action(detail=False, methods=["delete"], url_path="clear", url_name="clear-cart")
     def clear_cart(self, request, *args, **kwargs):
         """

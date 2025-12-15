@@ -202,3 +202,68 @@ LOGIN_REDIRECT_URL = "/api/v1/auth/users/me"
 
 DEMO_MODE = config("DEMO_MODE", cast=bool, default=False)
 DEMO_USER_TTL_HOURS = config("DEMO_USER_TTL_HOURS", cast=int, default=12)
+
+# drf-spectacular Settings
+
+SPECTACULAR_SETTINGS = {
+    "SERVE_INCLUDE_SCHEMA": False,  # hide schema from /docs UI
+    "SWAGGER_UI_SETTINGS": {
+        "persistAuthorization": True,  # keep JWT token when refreshing the page
+    },
+    "COMPONENT_SPLIT_REQUEST": True,
+    # Keep endpoints ordered how they appear in the project
+    "SORT_OPERATIONS": False,
+    "SORT_OPERATION_PARAMETERS": False,
+    # General schema metadata
+    "TITLE": "Restaurant API",
+    "DESCRIPTION": "A REST API for managing restaurant menus, orders, and role-based user access.",
+    "VERSION": "1.0.0",
+    "TAGS": [
+        {
+            "name": "Authentication",
+            "description": (
+                "Endpoints for authenticating users and managing JSON Web Tokens (JWTs)."
+            ),
+        },
+        {
+            "name": "Demo Authentication",
+            "description": (
+                "Endpoints for creating and managing temporary demo users and their "
+                "authentication tokens."
+            ),
+        },
+        {
+            "name": "Categories",
+            "description": (
+                "Endpoints for creating, retrieving, updating, and deleting menu categories."
+            ),
+        },
+        {
+            "name": "Menu",
+            "description": (
+                "Endpoints for creating, retrieving, updating, and deleting menu items."
+            ),
+        },
+        {
+            "name": "Cart",
+            "description": (
+                "Endpoints for creating, retrieving, updating, and deleting items in "
+                "the customer's cart."
+            ),
+        },
+        {
+            "name": "Orders",
+            "description": (
+                "Endpoints for creating, retrieving, updating, and deleting "
+                "customer orders based on user role."
+            ),
+        },
+        {
+            "name": "Role Groups",
+            "description": (
+                "Endpoints for managing manager, delivery crew, and customer "
+                "role memberships."
+            ),
+        },
+    ],
+}

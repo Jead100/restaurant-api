@@ -7,6 +7,7 @@ from django.contrib.auth.models import Group
 from django.db import transaction
 from django.utils import timezone
 
+from rest_framework import serializers
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -16,6 +17,10 @@ from rest_framework.views import APIView
 
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from rest_framework_simplejwt.views import TokenRefreshView
+
+from drf_spectacular.utils import extend_schema, inline_serializer
+
+from apps.core.schemas import SimpleDetailSerializer
 
 from ..permissions.demo import IsActiveDemo
 from ..roles import Role, ROLES
@@ -28,10 +33,46 @@ from ..serializers.demo import (
 User = get_user_model()
 
 
+@extend_schema(
+    tags=["Demo Authentication"],
+    summary="Create a demo user and issue tokens.",
+    description=(
+        "Creates a temporary demo user for the requested role and returns "
+        "an access and refresh JSON web token pair.\n\n"
+        "The demo user automatically expires after the configured "
+        "`DEMO_USER_TTL_HOURS` (you can see the exact expiry time in the response)."
+    ),
+    request=None,
+    responses={
+        201: inline_serializer(
+            name="DemoLoginResponse",
+            fields={
+                "detail": serializers.CharField(),
+                "user": inline_serializer(
+                    name="DemoLoginUser",
+                    fields={
+                        "username": serializers.CharField(),
+                        "role": serializers.CharField(),
+                        "expires_at": serializers.DateTimeField(),
+                    },
+                ),
+                "auth": inline_serializer(
+                    name="DemoLoginTokens",
+                    fields={
+                        "refresh": serializers.CharField(),
+                        "access": serializers.CharField(),
+                    },
+                ),
+            },
+        )
+    },
+)
 class DemoLoginView(APIView):
     """
-    Creates a temporary demo user assigned to the requested role and
-    returns JWT (access, refresh). User auto-expires after DEMO_USER_TTL_HOURS.
+    Creates a temporary demo user assigned to the requested role
+    and returns an access and refresh JSON web token pair.
+
+    User auto-expires after DEMO_USER_TTL_HOURS.
     """
 
     permission_classes = [AllowAny]
@@ -116,6 +157,10 @@ class DemoLoginView(APIView):
         return Response(data, status=status.HTTP_201_CREATED)
 
 
+@extend_schema(
+    tags=["Demo Authentication"],
+    summary="Retrieve the current demo user's profile.",
+)
 class DemoMeView(APIView):
     """
     Returns the authenticated demo user's profile and TTL information.
@@ -131,11 +176,14 @@ class DemoMeView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+@extend_schema(
+    tags=["Demo Authentication"],
+    summary="Refresh the access token for a demo user.",
+)
 class DemoTokenRefreshView(TokenRefreshView):
     """
-    Takes a refresh token and returns an access type JSON web
-    token if the refresh token is valid and the demo user
-    hasn't expired.
+    Takes a refresh token and returns an access type JSON web token
+    if the refresh token is valid and the demo user hasn't expired.
     """
 
     permission_classes = [AllowAny]
@@ -143,9 +191,15 @@ class DemoTokenRefreshView(TokenRefreshView):
     serializer_class = DemoSafeTokenRefreshSerializer
 
 
+@extend_schema(
+    tags=["Demo Authentication"],
+    summary="Blacklist the refresh token for a demo user.",
+    description="Takes a refresh token and blacklists it.",
+    responses={200: SimpleDetailSerializer},
+)
 class DemoLogoutView(APIView):
     """
-    Takes a refresh token and blacklists it.  Used with the
+    Takes a refresh token and blacklists it. Used with the
     `rest_framework_simplejwt.token_blacklist` app installed.
     """
 

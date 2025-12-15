@@ -4,6 +4,8 @@ Serializers for menu items and their categories.
 
 from django.urls import reverse
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field
+
 from ..models import MenuItem, Category
 
 
@@ -14,6 +16,18 @@ def _build_self_link(request, view_name: str, lookup_value):
             reverse(view_name, args=[lookup_value]),
         ),
     }
+
+
+# OpenAPI schema for the `links` field
+LINKS_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "self": {"type": "string", "format": "uri"},
+    },
+    "required": ["self"],
+}
+
+# Serializers
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -28,6 +42,7 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ("id", "title", "slug", "links")
         read_only_fields = ("id", "links")
 
+    @extend_schema_field(LINKS_SCHEMA)
     def get_links(self, obj):
         return _build_self_link(
             self.context.get("request"), "restaurant:category-detail", obj.slug
@@ -47,6 +62,7 @@ class CategoryTinySerializer(serializers.ModelSerializer):
         fields = ("title", "links")
         read_only_fields = fields
 
+    @extend_schema_field(LINKS_SCHEMA)
     def get_links(self, obj):
         return _build_self_link(
             self.context.get("request"), "restaurant:category-detail", obj.slug
@@ -62,6 +78,7 @@ class MenuItemResponseSerializer(serializers.HyperlinkedModelSerializer):
         fields = ("id", "title", "price", "featured", "category", "links")
         read_only_fields = fields
 
+    @extend_schema_field(LINKS_SCHEMA)
     def get_links(self, obj):
         return _build_self_link(
             self.context.get("request"), "restaurant:menuitem-detail", obj.pk

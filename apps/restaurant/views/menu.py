@@ -12,7 +12,7 @@ from drf_spectacular.utils import (
 )
 
 from apps.core.pagination import CustomPageNumberPagination
-from apps.core.schema.responses import wrapped_response, SimpleDetailResponseSerializer
+from apps.core.schemas import SimpleDetailSerializer
 from apps.restaurant.mixins import RestaurantDemoGuardMixin
 from apps.users.permissions import IsManagerOrReadOnly
 
@@ -24,14 +24,18 @@ from ..serializers.menu import (
     MenuItemWriteSerializer,
 )
 from ..viewsets import RestaurantBaseViewSet
+from ..schemas import MenuItemEnvelopeSerializer, CategoryEnvelopeSerializer
 
 
+@extend_schema(tags=["Menu"])
 @extend_schema_view(
     list=extend_schema(
-        summary="List all menu items",
-        description="Returns a paginated list of menu items. "
-        "Supports filtering (e.g., by price or category), "
-        "searching by title, and ordering.",
+        summary="Retrieve a list of all menu items.",
+        description=(
+            "Returns a paginated list of menu items.\n\n"
+            "Supports filtering by price, featured status, and category, "
+            "as well as searching by title, and ordering results."
+        ),
         parameters=[
             OpenApiParameter(
                 name="price__lte",
@@ -54,39 +58,44 @@ from ..viewsets import RestaurantBaseViewSet
         ],
     ),
     retrieve=extend_schema(
-        summary="Retrieve a single menu item",
-        description="Returns detailed information about one menu item.",
-        responses=wrapped_response(
-            serializer_class=MenuItemResponseSerializer,
-            detail_text=' message "Menu item retrieved successfully."',
-            data_text="The menu item object.",
+        summary="Retrieve a menu item by ID.",
+        description=(
+            "Returns detailed information for a single menu item "
+            "identified by its ID."
         ),
+        responses={200: MenuItemEnvelopeSerializer},
     ),
     create=extend_schema(
-        summary="Create a new menu item",
-        description="Adds a new item to the menu. Only users in the "
-        "'Manager' group can perform this action.",
-        responses=wrapped_response(
-            serializer_class=MenuItemResponseSerializer,
-            detail_text='message "Menu item created successfully."',
-            data_text="The newly created menu item.",
+        summary="Create a new menu item.",
+        description=(
+            "Creates a new menu item.\n\n"
+            "Only users in the 'Manager' group can perform this action."
         ),
+        responses={201: MenuItemEnvelopeSerializer},
     ),
     update=extend_schema(
-        summary="Update a menu item",
-        description="Replaces all fields of a menu item. "
-        "Only accessible to managers.",
-        responses=wrapped_response(MenuItemResponseSerializer),
+        summary="Replace a menu item with new data.",
+        description=(
+            "Replaces all fields of an existing menu item.\n\n"
+            "Only users in the 'Manager' group can perform this action."
+        ),
+        responses={200: MenuItemEnvelopeSerializer},
     ),
     partial_update=extend_schema(
-        summary="Partially update a menu item",
-        description="Updates selected fields of a menu item. Managers only.",
-        responses=wrapped_response(MenuItemResponseSerializer),
+        summary="Partially update a menu item.",
+        description=(
+            "Updates one or more fields of an existing menu item.\n\n"
+            "Only users in the 'Manager' group can perform this action."
+        ),
+        responses={200: MenuItemEnvelopeSerializer},
     ),
     destroy=extend_schema(
-        summary="Delete a menu item",
-        description="Removes a menu item from the system. Managers only.",
-        responses={200: SimpleDetailResponseSerializer},
+        summary="Delete a menu item.",
+        description=(
+            "Permanently removes a menu item.\n\n"
+            "Only users in the 'Manager' group can perform this action."
+        ),
+        responses={200: SimpleDetailSerializer},
     ),
 )
 class MenuItemViewSet(RestaurantDemoGuardMixin, RestaurantBaseViewSet):
@@ -96,8 +105,8 @@ class MenuItemViewSet(RestaurantDemoGuardMixin, RestaurantBaseViewSet):
     Supports listing, searching, filtering, creating, updating, and
     deleting menu items.
 
-    Only authenticated users that belong to 'manager' group can
-    perform write operations, enforced by `IsManagerOrReadOnly`.
+    Only authenticated users in the 'Manager' group can perform
+    write operations; all authenticated users can read menu items.
     """
 
     queryset = MenuItem.objects.select_related("category").all()
@@ -122,14 +131,62 @@ class MenuItemViewSet(RestaurantDemoGuardMixin, RestaurantBaseViewSet):
     resource_name = "Menu item"
 
     def get_serializer_class(self):
-        """
-        Returns the default serializer for an action in the viewset.
-        """
+        # Use write serializer for write actions, read serializer otherwise.
         if self.action in ("create", "update", "partial_update"):
             return MenuItemWriteSerializer
         return self.res_serializer_cls
 
 
+@extend_schema(tags=["Categories"])
+@extend_schema_view(
+    list=extend_schema(
+        summary="Retrieve a list of all categories.",
+        description=(
+            "Returns a paginated list of menu categories.\n\n"
+            "Supports searching by slug and ordering by `slug` or `title`."
+        ),
+    ),
+    retrieve=extend_schema(
+        summary="Retrieve a category by slug.",
+        description=(
+            "Returns detailed information for a single menu category "
+            "identified by its slug."
+        ),
+        responses={200: CategoryEnvelopeSerializer},
+    ),
+    create=extend_schema(
+        summary="Create a new category.",
+        description=(
+            "Creates a new menu category.\n\n"
+            "Only users in the 'Manager' group can perform this action."
+        ),
+        responses={201: CategoryEnvelopeSerializer},
+    ),
+    update=extend_schema(
+        summary="Replace a category with new data.",
+        description=(
+            "Replaces all fields of an existing menu category.\n\n"
+            "Only users in the 'Manager' group can perform this action."
+        ),
+        responses={200: CategoryEnvelopeSerializer},
+    ),
+    partial_update=extend_schema(
+        summary="Partially update a category.",
+        description=(
+            "Updates one or more fields of an existing menu category.\n\n"
+            "Only users in the 'Manager' group can perform this action."
+        ),
+        responses={200: CategoryEnvelopeSerializer},
+    ),
+    destroy=extend_schema(
+        summary="Delete a category.",
+        description=(
+            "Permanently removes a menu category.\n\n"
+            "Only users in the 'Manager' group can perform this action."
+        ),
+        responses={200: SimpleDetailSerializer},
+    ),
+)
 class CategoryViewSet(RestaurantDemoGuardMixin, RestaurantBaseViewSet):
     """
     Viewset for managing menu item categories.
@@ -137,8 +194,8 @@ class CategoryViewSet(RestaurantDemoGuardMixin, RestaurantBaseViewSet):
     Supports listing, searching, and ordering of categories, as well as
     creation, updating, and deletion
 
-    Only authenticated users that are part of the 'Manager' group can
-    perform write operations, enforced by `HasPermissionToCategoryAction`.
+    Only authenticated users in the 'Manager' group can perform
+    write operations; all authenticated users can read categories.
     """
 
     queryset = Category.objects.all()

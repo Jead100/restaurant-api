@@ -9,15 +9,19 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 
+from drf_spectacular.utils import extend_schema, extend_schema_view
+
 from apps.core.pagination import CustomPageNumberPagination
 from apps.core.responses import format_response
-from apps.restaurant.mixins import RestaurantDemoGuardMixin
+from apps.core.schemas import SimpleDetailSerializer
 from apps.users.permissions import IsCustomer, IsManager, IsManagerOrDeliveryCrew
 from apps.users.roles import resolve_user_roles
 
 
 from ..filters import OrderFilter, StrictOrderingFilter
+from ..mixins import RestaurantDemoGuardMixin
 from ..models import Cart, Order, OrderItem
+from ..schemas import OrderEnvelopeSerializer
 from ..serializers.order import (
     DeliveryCrewOrderUpdateSerializer,
     ManagerOrderResponseSerializer,
@@ -27,6 +31,56 @@ from ..serializers.order import (
 from ..viewsets import RestaurantBaseViewSet
 
 
+@extend_schema(tags=["Orders"])
+@extend_schema_view(
+    list=extend_schema(
+        summary="Retrieve a list of all orders.",
+        description=(
+            "Returns a paginated list of orders visible to the authenticated user, "
+            "based on their role.\n\n"
+            "- Managers see all orders.\n"
+            "- Delivery crew see only orders assigned to them.\n"
+            "- Customers see only their own orders.\n\n"
+            "Supports filtering and ordering via the configured OrderFilter."
+        ),
+    ),
+    retrieve=extend_schema(
+        summary="Retrieve an order by ID.",
+        description=(
+            "Returns detailed information for a single order, limited to the "
+            "orders visible to the authenticated user based on their role."
+        ),
+        responses={200: OrderEnvelopeSerializer},
+    ),
+    create=extend_schema(
+        summary="Create a new order from the cart.",
+        description=(
+            "Creates a new order from the authenticated customer's cart. "
+            "The cart must contain at least one item, and all cart items are "
+            "converted into order items before the cart is cleared.\n\n"
+            "Only customers can perform this action."
+        ),
+        responses={201: OrderEnvelopeSerializer},
+    ),
+    update=extend_schema(exclude=True),
+    partial_update=extend_schema(
+        summary="Partially update an order.",
+        description=(
+            "Updates one or more fields of an existing order.\n\n"
+            "Only managers and delivery crew can perform this action:\n"
+            "- Managers can update any order's '**status**' or assigned '**delivery_crew**'.\n"
+            "- Delivery crew can update only the '**status**' of their assigned order.\n"
+        ),
+        responses={200: OrderEnvelopeSerializer},
+    ),
+    destroy=extend_schema(
+        summary="Delete an order.",
+        description=(
+            "Permanently removes an order.\n\n" "Only managers can perform this action."
+        ),
+        responses={200: SimpleDetailSerializer},
+    ),
+)
 class OrderViewSet(RestaurantDemoGuardMixin, RestaurantBaseViewSet):
     """
     Viewset for managing customer orders.
@@ -38,6 +92,9 @@ class OrderViewSet(RestaurantDemoGuardMixin, RestaurantBaseViewSet):
     and change order statuses. Delivery crew can view and update their
     assigned orders. Customers can view and create their own orders.
     """
+
+    # Base queryset; for schema/model introspection
+    queryset = Order.objects.all()
 
     # Default base permission
     permission_classes = (IsAuthenticated,)
