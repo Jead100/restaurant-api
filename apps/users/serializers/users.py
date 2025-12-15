@@ -1,17 +1,36 @@
+from typing import List
+
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
+
+from ..roles import resolve_user_roles
 
 User = get_user_model()
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserTinySerializer(serializers.ModelSerializer):
     """
-    Serializer for displaying minimal user info.
+    Serializer for minimal user info.
     """
 
     class Meta:
         model = User
         fields = ("id", "username")
+
+
+class UserSerializer(serializers.ModelSerializer):
+    """
+    Serializer for basic user info with roles.
+    """
+
+    roles = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ("id", "username", "roles")
+
+    def get_roles(self, obj) -> List[str]:
+        return resolve_user_roles(obj)
 
 
 class UsernameLookupSerializer(serializers.Serializer):

@@ -9,7 +9,7 @@ from apps.core.mixins import model_mixins
 from apps.core.responses import format_response
 from apps.core.viewsets import ExtendedGenericViewSet
 
-from .serializers.users import UserSerializer, UsernameLookupSerializer
+from .serializers.users import UserTinySerializer, UsernameLookupSerializer
 
 User = get_user_model()
 
@@ -72,7 +72,7 @@ class GroupMembershipViewSet(
         """
         if self.action == "create":
             return UsernameLookupSerializer
-        return UserSerializer
+        return UserTinySerializer
 
     def perform_create(self, serializer):
         # Add the validated user to the group

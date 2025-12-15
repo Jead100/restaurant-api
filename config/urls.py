@@ -9,17 +9,20 @@ from drf_spectacular.views import (
     SpectacularSwaggerView,
 )
 
+DEBUG = settings.DEBUG
+DEMO_MODE = settings.DEMO_MODE
+EXPOSE_FULL_DJOSER = settings.EXPOSE_FULL_DJOSER
+
+
 urlpatterns = [
     # Home page
     path("", TemplateView.as_view(template_name="home.html"), name="home"),
     # App endpoints
     path(
         "api/v1/restaurant/",
-        include(("apps.restaurant.urls", "restaurant"), namespace="restaurant"),
+        include("apps.restaurant.urls", namespace="restaurant"),
     ),
-    path(
-        "api/v1/users/", include(("apps.users.urls.groups", "users"), namespace="users")
-    ),
+    path("api/v1/users/", include("apps.users.urls.groups", namespace="users")),
     # OpenAPI schema & UIs
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
@@ -34,23 +37,28 @@ urlpatterns = [
     ),
 ]
 
-if settings.DEBUG:
+if DEBUG:
     urlpatterns += [path("admin/", admin.site.urls)]
 
-EXPOSE_DJOSER = settings.DEBUG or not settings.DEMO_MODE
-if EXPOSE_DJOSER:
-    # Always expose Djoser endpoints for full user management
-    # when DEBUG=True or DEMO_MODE=False
+if DEBUG or not DEMO_MODE:
+    # Always expose Djoser JWT when DEBUG=True or DEMO_MODE=False
     urlpatterns += [
-        path("api/v1/auth/", include("djoser.urls")),
         path("api/v1/auth/", include("djoser.urls.jwt")),
     ]
 
-if settings.DEMO_MODE:
-    # Only add/expose demo user endpoints when DEMO_MODE=True
+    # In DEBUG, optionally expose full Djoser
+    if DEBUG and EXPOSE_FULL_DJOSER:
+        urlpatterns += [
+            path("api/v1/auth/", include("djoser.urls")),
+        ]
+    else:
+        # A simple minimal profile endpoint will suffice
+        urlpatterns += [
+            path("api/v1/auth/", include("apps.users.urls.me", namespace="me")),
+        ]
+
+if DEMO_MODE:
+    # Only add/expose demo user management endpoints when DEMO_MODE=True
     urlpatterns += [
-        path(
-            "api/v1/auth/",
-            include(("apps.users.urls.demo", "users"), namespace="demo-users"),
-        )
+        path("api/v1/auth/demo/", include("apps.users.urls.demo", namespace="demo"))
     ]

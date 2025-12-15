@@ -1,17 +1,17 @@
 from apps.core.schemas import BaseEnvelopeSerializer
-from apps.users.serializers import UserSerializer
+from apps.users.serializers import UserTinySerializer
 
 from drf_spectacular.extensions import OpenApiViewExtension
 from drf_spectacular.utils import extend_schema, extend_schema_serializer
 
 
-@extend_schema_serializer(component_name="UserEnvelope")
-class UserEnvelopeSerializer(BaseEnvelopeSerializer):
+@extend_schema_serializer(component_name="UserTinyEnvelope")
+class UserTinyEnvelopeSerializer(BaseEnvelopeSerializer):
     """
     Envelope schema for user objects
     """
 
-    data = UserSerializer(
+    data = UserTinySerializer(
         help_text="User resource",
         read_only=True,
     )

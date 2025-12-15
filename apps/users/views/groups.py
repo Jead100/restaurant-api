@@ -19,8 +19,8 @@ from apps.restaurant.models import Order
 from ..mixins.demo import DemoUserAccessMixin, GroupDemoGuardMixin
 from ..permissions import IsManagerOrAdminUser, IsManagerForReadOnlyOrAdminUser
 from ..roles import Role
-from ..schemas import UserEnvelopeSerializer
-from ..serializers import UserSerializer
+from ..schemas import UserTinyEnvelopeSerializer
+from ..serializers import UserTinySerializer
 from ..viewsets import GroupMembershipViewSet
 
 User = get_user_model()
@@ -41,7 +41,7 @@ User = get_user_model()
             "Returns details for a single user in the 'Manager' group.\n\n"
             "Only managers and admin users can access this endpoint."
         ),
-        responses={200: UserEnvelopeSerializer},
+        responses={200: UserTinyEnvelopeSerializer},
     ),
     create=extend_schema(
         summary="Add a user to the Manager group.",
@@ -95,7 +95,7 @@ class ManagerGroupViewSet(
             "Returns details for a single user in the 'Delivery crew' group.\n\n"
             "Only managers and admin users can access this endpoint."
         ),
-        responses={200: UserEnvelopeSerializer},
+        responses={200: UserTinyEnvelopeSerializer},
     ),
     create=extend_schema(
         summary="Add a user to the Delivery crew group.",
@@ -179,7 +179,7 @@ class CustomerListAPIView(
         .exclude(is_superuser=True)  # exclude admin-level users
         .order_by("id")
     )
-    serializer_class = UserSerializer
+    serializer_class = UserTinySerializer
     permission_classes = [IsAuthenticated, IsManagerOrAdminUser]
     throttle_classes = [AnonRateThrottle, UserRateThrottle]
     pagination_class = CustomPageNumberPagination

@@ -6,26 +6,11 @@ from ..views.demo import (
     DemoLogoutView,
 )
 
+app_name = "demo"
 
 urlpatterns = [
-    path(
-        "demo-login/<str:role>/",
-        DemoLoginView.as_view(),
-        name="demo-login",
-    ),
-    path(
-        "demo-me/",
-        DemoMeView.as_view(),
-        name="auth-me",
-    ),
-    path(
-        "demo-token/refresh/",
-        DemoTokenRefreshView.as_view(),
-        name="demo_token_refresh",
-    ),
-    path(
-        "demo-logout/",
-        DemoLogoutView.as_view(),
-        name="auth-logout",
-    ),  # blacklist current refresh
+    path("login/<str:role>/", DemoLoginView.as_view(), name="login"),
+    path("me/", DemoMeView.as_view(), name="me"),
+    path("token/refresh/", DemoTokenRefreshView.as_view(), name="token-refresh"),
+    path("logout/", DemoLogoutView.as_view(), name="logout"),
 ]

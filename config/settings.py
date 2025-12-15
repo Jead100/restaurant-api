@@ -136,7 +136,8 @@ if not DEBUG:
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# REST Framework
+# REST Framework Settings
+
 REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
@@ -196,6 +197,9 @@ DJOSER = {
     },
 }
 
+# Expose full Djoser endpoints
+EXPOSE_FULL_DJOSER = config("EXPOSE_FULL_DJOSER", cast=bool, default=False)
+
 LOGIN_REDIRECT_URL = "/api/v1/auth/users/me"
 
 # Demo Mode Settings
@@ -204,6 +208,31 @@ DEMO_MODE = config("DEMO_MODE", cast=bool, default=False)
 DEMO_USER_TTL_HOURS = config("DEMO_USER_TTL_HOURS", cast=int, default=12)
 
 # drf-spectacular Settings
+
+# Build authentication-related OpenAPI tags dynamically based on DEBUG and DEMO_MODE
+AUTH_TAGS = []
+if DEBUG or not DEMO_MODE:
+    # In development (DEBUG=True) or when demo mode is disabled (DEMO_MODE=False),
+    # expose the standard Authentication tag.
+    AUTH_TAGS = [
+        {
+            "name": "Authentication",
+            "description": (
+                "Endpoints for authenticating users and managing JSON Web Tokens (JWTs)."
+            ),
+        }
+    ]
+if DEMO_MODE:
+    # In demo mode, also expose the Demo Authentication tag.
+    AUTH_TAGS += [
+        {
+            "name": "Demo Authentication",
+            "description": (
+                "Endpoints for creating and managing temporary demo users and their "
+                "authentication tokens."
+            ),
+        }
+    ]
 
 SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,  # hide schema from /docs UI
@@ -219,19 +248,7 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "A REST API for managing restaurant menus, orders, and role-based user access.",
     "VERSION": "1.0.0",
     "TAGS": [
-        {
-            "name": "Authentication",
-            "description": (
-                "Endpoints for authenticating users and managing JSON Web Tokens (JWTs)."
-            ),
-        },
-        {
-            "name": "Demo Authentication",
-            "description": (
-                "Endpoints for creating and managing temporary demo users and their "
-                "authentication tokens."
-            ),
-        },
+        *AUTH_TAGS,
         {
             "name": "Categories",
             "description": (
