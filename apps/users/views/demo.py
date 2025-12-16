@@ -110,11 +110,14 @@ class DemoLoginView(APIView):
             demo_expires_at = timezone.now() + timedelta(hours=ttl_hours)
 
             # Mark user as demo + set expiry
+            update_fields = []
             if hasattr(user, "is_demo"):
                 user.is_demo = True
+                update_fields.append("is_demo")
             if hasattr(user, "demo_expires_at"):
                 user.demo_expires_at = demo_expires_at
-            user.save(update_fields=["is_demo", "demo_expires_at"] or None)
+                update_fields.append("demo_expires_at")
+            user.save(update_fields=update_fields or None)
 
             # Assign group if not a customer (customers don't belong to one)
             if role_enum != Role.CUSTOMER:
