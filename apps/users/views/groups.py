@@ -3,7 +3,6 @@ from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 
 from drf_spectacular.utils import (
     extend_schema,
@@ -74,10 +73,17 @@ class ManagerGroupViewSet(
     group_name = str(Role.MANAGER.label)
 
     permission_classes = [IsAuthenticated, IsManagerForReadOnlyOrAdminUser]
-    throttle_classes = [AnonRateThrottle, UserRateThrottle]
     pagination_class = CustomPageNumberPagination
 
     resource_name = "Manager"
+
+    def get_throttles(self):
+        # Limit request rates per action
+        if self.action in ("list", "retrieve"):
+            self.throttle_scope = "groups_read"
+        else:
+            self.throttle_scope = "groups_write"
+        return super().get_throttles()
 
 
 @extend_schema(tags=["Role Groups"])
@@ -129,10 +135,18 @@ class DeliveryCrewGroupViewSet(
     group_name = str(Role.DELIVERY_CREW.label)
 
     permission_classes = [IsAuthenticated, IsManagerOrAdminUser]
-    throttle_classes = [AnonRateThrottle, UserRateThrottle]
     pagination_class = CustomPageNumberPagination
 
     resource_name = "Delivery crew member"
+
+    def get_throttles(self):
+        if self.action in ("list", "retrieve"):
+            self.throttle_scope = "groups_read"
+        elif self.action == "destroy":
+            self.throttle_scope = "groups_deliverycrew_remove"
+        else:
+            self.throttle_scope = "groups_write"
+        return super().get_throttles()
 
     def destroy(self, request, *args, **kwargs):
         """
@@ -181,6 +195,6 @@ class CustomerListAPIView(
     )
     serializer_class = UserTinySerializer
     permission_classes = [IsAuthenticated, IsManagerOrAdminUser]
-    throttle_classes = [AnonRateThrottle, UserRateThrottle]
     pagination_class = CustomPageNumberPagination
+    throttle_scope = "customers_read"
     resource_name = "Customer"

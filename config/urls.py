@@ -41,9 +41,9 @@ if DEBUG:
     urlpatterns += [path("admin/", admin.site.urls)]
 
 if DEBUG or not DEMO_MODE:
-    # Always expose Djoser JWT when DEBUG=True or DEMO_MODE=False
+    # Always expose JWT when DEBUG=True or DEMO_MODE=False
     urlpatterns += [
-        path("api/v1/auth/", include("djoser.urls.jwt")),
+        path("api/v1/auth/", include("apps.users.urls.jwt", namespace="jwt")),
     ]
 
     # In DEBUG, optionally expose full Djoser

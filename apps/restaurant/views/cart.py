@@ -4,7 +4,6 @@ from rest_framework import filters
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 
 from drf_spectacular.utils import (
     extend_schema,
@@ -88,7 +87,6 @@ class CartViewSet(RestaurantDemoGuardMixin, RestaurantBaseViewSet):
     queryset = Cart.objects.all()
 
     permission_classes = [IsAuthenticated, IsCustomer]
-    throttle_classes = [AnonRateThrottle, UserRateThrottle]
 
     filter_backends = [StrictOrderingFilter, filters.SearchFilter]
     search_fields = ["menuitem__title"]
@@ -113,8 +111,18 @@ class CartViewSet(RestaurantDemoGuardMixin, RestaurantBaseViewSet):
         # Return cart items for the authenticated user
         return Cart.objects.filter(user=self.request.user).select_related("menuitem")
 
+    def get_throttles(self):
+        # Limit request rates per action
+        if self.action in ("list", "retrieve"):
+            self.throttle_scope = "cart_read"
+        elif self.action == "clear_cart":
+            self.throttle_scope = "cart_clear"
+        else:
+            self.throttle_scope = "cart_write"
+        return super().get_throttles()
+
     def get_serializer_class(self):
-        # Return the write serializer for create/update actions,
+        # Return the appropriate serializer for create/update actions,
         # otherwise use the read-only serializer.
         if self.action == "create":
             return CartCreateSerializer

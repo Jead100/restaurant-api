@@ -7,7 +7,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
@@ -99,7 +98,6 @@ class OrderViewSet(RestaurantDemoGuardMixin, RestaurantBaseViewSet):
     # Default base permission
     permission_classes = (IsAuthenticated,)
 
-    throttle_classes = [AnonRateThrottle, UserRateThrottle]
     filter_backends = [DjangoFilterBackend, StrictOrderingFilter]
     filterset_class = OrderFilter
     ordering_fields = ["id", "date", "status", "total"]
@@ -108,6 +106,7 @@ class OrderViewSet(RestaurantDemoGuardMixin, RestaurantBaseViewSet):
 
     resource_name = "Order"
 
+    # Role-based serializers for read/write operations
     READ_SERIALIZERS = {
         "manager": ManagerOrderResponseSerializer,
         "delivery_crew": OrderResponseSerializer,
@@ -182,6 +181,18 @@ class OrderViewSet(RestaurantDemoGuardMixin, RestaurantBaseViewSet):
         elif self.user_role == "customer":
             return qs.filter(user=self.request.user)
         return Order.objects.none()
+
+    def get_throttles(self):
+        # Limit request rates per action
+        if self.action == "create":
+            self.throttle_scope = "orders_create"
+        elif self.action in ("update", "partial_update"):
+            self.throttle_scope = "orders_update"
+        elif self.action == "destroy":
+            self.throttle_scope = "orders_delete"
+        else:
+            self.throttle_scope = "orders_read"
+        return super().get_throttles()
 
     def get_serializer_class(self):
         # For drf-spectacular schema generation only

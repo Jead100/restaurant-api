@@ -2,7 +2,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from rest_framework import filters
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 
 from drf_spectacular.utils import (
     extend_schema,
@@ -111,7 +110,6 @@ class MenuItemViewSet(RestaurantDemoGuardMixin, RestaurantBaseViewSet):
 
     queryset = MenuItem.objects.select_related("category").all()
     permission_classes = [IsAuthenticated, IsManagerOrReadOnly]
-    throttle_classes = [AnonRateThrottle, UserRateThrottle]
 
     # Read-only serializer used for list/retrieve responses and
     # for reserializing output in create/update actions
@@ -130,8 +128,17 @@ class MenuItemViewSet(RestaurantDemoGuardMixin, RestaurantBaseViewSet):
     # Used in default response messages via `self.msg()`
     resource_name = "Menu item"
 
+    def get_throttles(self):
+        # Limit request rates per action
+        if self.action in ("list", "retrieve"):
+            self.throttle_scope = "menuitems_read"
+        else:
+            self.throttle_scope = "menuitems_write"
+        return super().get_throttles()
+
     def get_serializer_class(self):
-        # Use write serializer for write actions, read serializer otherwise.
+        # Return the write serializer for create/update actions,
+        # otherwise use the read-only serializer.
         if self.action in ("create", "update", "partial_update"):
             return MenuItemWriteSerializer
         return self.res_serializer_cls
@@ -202,7 +209,6 @@ class CategoryViewSet(RestaurantDemoGuardMixin, RestaurantBaseViewSet):
     serializer_class = CategorySerializer
     permission_classes = [IsAuthenticated, IsManagerOrReadOnly]
     lookup_field = "slug"
-    throttle_classes = [AnonRateThrottle, UserRateThrottle]
 
     filter_backends = [DjangoFilterBackend, StrictOrderingFilter, filters.SearchFilter]
     ordering_fields = ["slug", "title"]
@@ -211,3 +217,10 @@ class CategoryViewSet(RestaurantDemoGuardMixin, RestaurantBaseViewSet):
 
     resource_name = "Menu category"
     resource_plural_name = "Menu categories"
+
+    def get_throttles(self):
+        if self.action in ("list", "retrieve"):
+            self.throttle_scope = "categories_read"
+        else:
+            self.throttle_scope = "categories_write"
+        return super().get_throttles()

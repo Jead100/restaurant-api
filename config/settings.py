@@ -155,10 +155,39 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_CLASSES": [
         "rest_framework.throttling.AnonRateThrottle",
         "rest_framework.throttling.UserRateThrottle",
+        "rest_framework.throttling.ScopedRateThrottle",
     ],
     "DEFAULT_THROTTLE_RATES": {
-        "anon": "100/day",
-        "user": "2000/day",
+        # Baseline protection for everyone
+        "anon": "60/min",
+        "user": "300/min",
+        # Auth rates
+        "auth_login": "10/min",
+        "auth_me": "60/min",
+        "auth_refresh": "30/min",
+        "auth_verify": "60/min",
+        "auth_logout": "10/min",
+        "demo_create": "3/hour",
+        # Menu rates
+        "menuitems_read": "180/min",
+        "menuitems_write": "30/min",
+        "categories_read": "120/min",
+        "categories_write": "20/min",
+        # Cart rates
+        "cart_read": "120/min",
+        "cart_write": "60/min",
+        "cart_clear": "10/min",
+        # Order rates
+        "orders_read": "120/min",
+        "orders_create": "10/min",
+        "orders_update": "30/min",
+        "orders_delete": "10/min",
+        # Group rates
+        "groups_read": "60/min",
+        "groups_write": "10/min",
+        "groups_deliverycrew_remove": "5/min",
+        # customer list
+        "customers_read": "30/min",
     },
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }

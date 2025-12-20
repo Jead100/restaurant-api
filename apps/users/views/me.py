@@ -8,14 +8,17 @@ from drf_spectacular.utils import extend_schema
 from ..serializers import UserSerializer
 
 
-@extend_schema(tags=["Authentication"])
+@extend_schema(
+    tags=["Authentication"],
+    summary="Retrieve the current user's profile.",
+)
 class CurrentUserView(APIView):
     """
-    Returns the authenticated user's profile.
-    Mirrors Djoser's /users/me/ endpoint.
+    Returns the authenticated user's profile for normal (non-demo) users.
     """
 
     permission_classes = [IsAuthenticated]
+    throttle_scope = "auth_me"
     serializer_class = UserSerializer
 
     def get(self, request, *args, **kwargs):

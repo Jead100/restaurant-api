@@ -12,7 +12,6 @@ from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 from rest_framework.views import APIView
 
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
@@ -76,7 +75,7 @@ class DemoLoginView(APIView):
     """
 
     permission_classes = [AllowAny]
-    throttle_classes = [AnonRateThrottle, UserRateThrottle]
+    throttle_scope = "demo_create"
 
     def post(self, request, *args, **kwargs):
         if not getattr(settings, "DEMO_MODE", False):
@@ -170,7 +169,7 @@ class DemoMeView(APIView):
     """
 
     permission_classes = [IsAuthenticated, IsActiveDemo]
-    throttle_classes = [AnonRateThrottle, UserRateThrottle]
+    throttle_scope = "auth_me"
     serializer_class = DemoMeSerializer
 
     def get(self, request, *args, **kwargs):
@@ -190,7 +189,7 @@ class DemoTokenRefreshView(TokenRefreshView):
     """
 
     permission_classes = [AllowAny]
-    throttle_classes = [AnonRateThrottle, UserRateThrottle]
+    throttle_scope = "auth_refresh"
     serializer_class = DemoSafeTokenRefreshSerializer
 
 
@@ -207,7 +206,7 @@ class DemoLogoutView(APIView):
     """
 
     permission_classes = [IsAuthenticated, IsActiveDemo]
-    throttle_classes = [AnonRateThrottle, UserRateThrottle]
+    throttle_scope = "auth_logout"
     serializer_class = DemoLogoutSerializer
 
     def post(self, request, *args, **kwargs):
