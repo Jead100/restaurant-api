@@ -17,7 +17,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from rest_framework_simplejwt.views import TokenRefreshView
 
-from drf_spectacular.utils import extend_schema, inline_serializer
+from drf_spectacular.utils import extend_schema, inline_serializer, OpenApiParameter
 
 from apps.core.schemas import SimpleDetailSerializer
 
@@ -39,8 +39,20 @@ User = get_user_model()
         "Creates a temporary demo user for the requested role and returns "
         "an access and refresh JSON web token pair.\n\n"
         "The demo user automatically expires after the configured "
-        "`DEMO_USER_TTL_HOURS` (you can see the exact expiry time in the response)."
+        "DEMO_USER_TTL_HOURS (you can see the exact expiry time in the response)."
     ),
+    parameters=[
+        OpenApiParameter(
+            name="role",
+            type=str,
+            location=OpenApiParameter.PATH,
+            description=(
+                "Role for the demo user.\n\n"
+                "**Allowed values:** `customer`, `delivery_crew`, `manager`"
+            ),
+            required=True,
+        ),
+    ],
     request=None,
     responses={
         201: inline_serializer(
