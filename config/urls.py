@@ -11,7 +11,7 @@ from drf_spectacular.views import (
 
 DEBUG = settings.DEBUG
 DEMO_MODE = settings.DEMO_MODE
-EXPOSE_FULL_DJOSER = settings.EXPOSE_FULL_DJOSER
+EXPOSE_DJOSER = settings.EXPOSE_DJOSER
 
 
 urlpatterns = [
@@ -46,8 +46,8 @@ if DEBUG or not DEMO_MODE:
         path("api/v1/auth/", include("apps.users.urls.jwt", namespace="jwt")),
     ]
 
-    # In DEBUG, optionally expose full Djoser
-    if DEBUG and EXPOSE_FULL_DJOSER:
+    # In DEBUG, optionally expose Djoser
+    if DEBUG and EXPOSE_DJOSER:
         urlpatterns += [
             path("api/v1/auth/", include("djoser.urls")),
         ]

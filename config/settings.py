@@ -226,8 +226,8 @@ DJOSER = {
     },
 }
 
-# Expose full Djoser endpoints
-EXPOSE_FULL_DJOSER = config("EXPOSE_FULL_DJOSER", cast=bool, default=False)
+# Expose Djoser user endpoints (useful for development and debugging)
+EXPOSE_DJOSER = config("EXPOSE_DJOSER", cast=bool, default=False)
 
 LOGIN_REDIRECT_URL = "/api/v1/auth/users/me"
 
