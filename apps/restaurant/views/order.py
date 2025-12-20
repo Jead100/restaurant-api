@@ -184,12 +184,16 @@ class OrderViewSet(RestaurantDemoGuardMixin, RestaurantBaseViewSet):
         return Order.objects.none()
 
     def get_serializer_class(self):
-        # Return the appropriate serializer based on action and user role.
-        # Write serializers are used for updates; read serializers for
-        # all other actions.
-        if self.action in ("update", "partial_update"):
-            return self.WRITE_SERIALIZERS.get(self.user_role, OrderResponseSerializer)
+        # For drf-spectacular schema generation only
+        # Schema introspection has no reliable request/user context
+        if getattr(self, "swagger_fake_view", False):
+            if self.action in ("update", "partial_update"):
+                return ManagerOrderUpdateSerializer
+            return ManagerOrderResponseSerializer
 
+        # Resolve serializer based on action and user role
+        if self.action in ("update", "partial_update"):
+            return self.WRITE_SERIALIZERS[self.user_role]
         return self.READ_SERIALIZERS[self.user_role]
 
     def create(self, request, *args, **kwargs):
