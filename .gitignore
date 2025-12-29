@@ -1,24 +1,34 @@
-# Byte-compiled / cache
+# Python cache
 __pycache__/
 *.py[cod]
+
+# Local databases
 *.sqlite3
+
+# Virtual environments
+.venv/
 
 # Pipenv
 Pipfile.lock
-.venv/
 
-# OS / Editor
+# OS / editor files
 .DS_Store
 Thumbs.db
 *.log
 
-# VSCode or JetBrains IDEs
+# VS Code / JetBrains IDEs
 .vscode/
 .idea/
 
-# Static / media
+# Static / media files
 staticfiles/
 media/
 
 # Secrets
 .env
+
+# Fixtures (ignore all by default)
+fixtures/*
+
+# Allow committed seed data
+!fixtures/initial_data.json

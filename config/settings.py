@@ -120,6 +120,8 @@ STATIC_URL = "/static/"
 
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
+FIXTURE_DIRS = [BASE_DIR / "fixtures"]
+
 if not DEBUG:
     STATIC_ROOT = BASE_DIR / "staticfiles"
 
