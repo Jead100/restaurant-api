@@ -4,8 +4,6 @@ A production-ready REST API for managing a restaurant's menu, carts, and orders,
 built with Django REST Framework and designed around real-world backend patterns
 including role-based permissions, JWT authentication, and OpenAPI documentation.
 
----
-
 ## Features
 
 - Role-based access control (Manager, Delivery Crew, Customer)
@@ -18,8 +16,6 @@ including role-based permissions, JWT authentication, and OpenAPI documentation.
 - Scoped throttling and rate limiting
 - PostgreSQL (production) and SQLite (development) support
 
----
-
 ## Tech Stack
 
 - **Python** 3.11
@@ -29,8 +25,6 @@ including role-based permissions, JWT authentication, and OpenAPI documentation.
 - **Djoser** – user management
 - **drf-spectacular** – OpenAPI documentation
 - **django-filter** – filtering and query support
-
----
 
 ## Live Demo
 
@@ -43,8 +37,6 @@ The API is deployed on **Render** with demo mode enabled.
 > ⚠️ Note: The public deployment runs with `DEBUG=False` and `DEMO_MODE=True`,
 > enabling demo authentication while disabling development-only features.
 
----
-
 ## API Documentation
 
 Interactive API documentation is available via:
@@ -52,8 +44,6 @@ Interactive API documentation is available via:
 - **Swagger UI**: `/api/schema/swagger-ui/`
 - **Redoc**: `/api/schema/redoc/`
 - **OpenAPI schema**: `/api/schema/`
-
----
 
 ## User Roles & Permissions
 
@@ -74,8 +64,6 @@ Interactive API documentation is available via:
 User group membership is managed through dedicated API endpoints and enforced
 via role-based permissions.
 
----
-
 ## Authentication
 
 The API uses JWT authentication with access and refresh tokens.
@@ -94,8 +82,6 @@ that allow clients to create temporary users without registration.
 
 This mode is designed for production sandbox environments while preserving
 data integrity.
-
----
 
 ## Local Setup
 
@@ -197,8 +183,6 @@ The API will be available at:
 http://127.0.0.1:8000/
 ```
 
----
-
 ## Example Endpoints
 
 - `GET /api/v1/restaurant/items/` – list menu items
@@ -209,22 +193,16 @@ http://127.0.0.1:8000/
 
 Refer to the API documentation for full details.
 
----
-
 ## Contact
 
 If you'd like to get in touch, feel free to reach me at
 ascanoa.jordan@gmail.com or connect with me on LinkedIn.
-
----
 
 ## Contributing
 
 This project is open source but primarily serves as a personal portfolio.
 If you spot an issue or have a suggestion, feel free to open an issue
 or submit a pull request.
-
----
 
 ## License
 
